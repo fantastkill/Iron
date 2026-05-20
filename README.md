@@ -5,6 +5,10 @@ Aplicacao web de gestao de academia com tres perfis:
 - Professor (personal trainer)
 - Aluno
 
+## Abrir agora
+- App online: https://fantastkill.github.io/Iron/
+- Arquivo unico: [iron-pulse-all-in-one.html](./iron-pulse-all-in-one.html)
+
 ## Execucao
 Abra `index.html` em um navegador moderno. Nao requer build nem servidor.
 
