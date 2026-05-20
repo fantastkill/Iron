@@ -1,0 +1,1669 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iron Pulse Gym</title>
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root {
+  --bg: #0c0c0f;
+  --panel: #151519;
+  --panel-soft: #1f2026;
+  --accent: #ffd400;
+  --accent-hover: #f1c100;
+  --danger: #ef4444;
+  --text: #fbfbfb;
+  --muted: #b8bbc7;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(255, 212, 0, 0.15), transparent 35%),
+    radial-gradient(circle at 90% 90%, rgba(255, 212, 0, 0.08), transparent 35%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app {
+  width: min(1150px, 100%);
+  margin: 0 auto;
+}
+
+.login-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.landing-shell {
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.marketing-panel {
+  background: linear-gradient(165deg, #151519 0%, #101113 60%, #0b0b0d 100%);
+  border: 1px solid rgba(255, 212, 0, 0.2);
+  border-radius: 18px;
+  padding: 30px;
+  display: grid;
+  gap: 16px;
+}
+
+.kicker {
+  display: inline-flex;
+  width: fit-content;
+  background: rgba(255, 212, 0, 0.16);
+  border: 1px solid rgba(255, 212, 0, 0.4);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.marketing-panel h1 {
+  color: var(--accent);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.login-box {
+  width: 100%;
+  max-width: 430px;
+  background: rgba(21, 21, 25, 0.96);
+  padding: 34px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 212, 0, 0.22);
+  box-shadow: 0 24px 45px rgba(0, 0, 0, 0.35);
+}
+
+.login-box h2 {
+  text-align: left;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-bottom: 20px;
+}
+
+.hint.left {
+  text-align: left;
+}
+
+.promo-carousel {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 212, 0, 0.18);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.promo-slide {
+  display: none;
+  animation: fadeIn 0.35s ease;
+}
+
+.promo-slide.active {
+  display: block;
+}
+
+.promo-slide strong {
+  display: block;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.promo-slide p {
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.promo-dots {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 212, 0, 0.6);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dot.active {
+  background: var(--accent);
+}
+
+.plan-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.plan-card {
+  background: var(--panel-soft);
+  border: 1px solid rgba(255, 212, 0, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.plan-card.featured {
+  border-color: rgba(255, 212, 0, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 212, 0, 0.22);
+}
+
+.plan-label {
+  font-size: 0.78rem;
+  color: #111;
+  background: var(--accent);
+  padding: 4px 8px;
+  border-radius: 999px;
+  width: fit-content;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.plan-card h3 {
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.price {
+  color: var(--accent);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.price span {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.promo {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+}
+
+.legal-note {
+  color: #8b8f9f;
+  font-size: 0.76rem;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.tab.active {
+  border-color: var(--accent);
+  background: rgba(255, 212, 0, 0.1);
+}
+
+.form {
+  display: none;
+}
+
+.form.active {
+  display: block;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(184, 187, 199, 0.2);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.input-group textarea {
+  resize: vertical;
+}
+
+.field-inline {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.field-toggle {
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 212, 0, 0.35);
+  background: rgba(255, 212, 0, 0.08);
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.input-group input.input-ok,
+.input-group select.input-ok {
+  border-color: rgba(61, 209, 116, 0.9);
+  box-shadow: 0 0 0 3px rgba(61, 209, 116, 0.15);
+}
+
+.input-group input.input-bad,
+.input-group select.input-bad {
+  border-color: rgba(239, 68, 68, 0.95);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+}
+
+.signup-health {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 212, 0, 0.2);
+}
+
+.strength-meter {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+#passStrengthFill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: #d64545;
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+
+#passStrengthFill.level-2 {
+  background: #ef9045;
+}
+
+#passStrengthFill.level-3 {
+  background: #e8be2d;
+}
+
+#passStrengthFill.level-4 {
+  background: #39c96b;
+}
+
+.field-hint {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.field-hint.ok {
+  color: #5ee191;
+}
+
+.field-hint.bad {
+  color: #f28080;
+}
+
+.requirement-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.requirement-list li {
+  color: #c0c5d3;
+  font-size: 0.83rem;
+}
+
+.requirement-list li::before {
+  content: "○";
+  margin-right: 6px;
+}
+
+.requirement-list li.ok {
+  color: #8ff0b2;
+}
+
+.requirement-list li.ok::before {
+  content: "●";
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: #141414;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+}
+
+.btn:disabled {
+  background: #6e6f74;
+  color: #e8e8e8;
+  cursor: not-allowed;
+}
+
+.msg {
+  min-height: 20px;
+  margin-top: 14px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.msg.ok {
+  color: #ffe066;
+}
+
+.msg.bad {
+  color: var(--danger);
+}
+
+.msg.inline {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.painel {
+  display: none;
+  min-height: 100vh;
+  padding: 30px 20px 40px;
+}
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.topo h1 {
+  color: var(--accent);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.logout {
+  background: var(--danger);
+  color: var(--text);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--panel);
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 212, 0, 0.18);
+  border-left: 5px solid var(--accent);
+}
+
+.card h3 {
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.titulo {
+  margin: 35px 0 16px;
+  color: var(--accent);
+  font-size: clamp(1.25rem, 3vw, 1.7rem);
+}
+
+.aluno-item {
+  background: var(--panel-soft);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.aluno-item p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.treino-box {
+  background: var(--panel-soft);
+  padding: 18px;
+  border-radius: 10px;
+  margin-top: 14px;
+}
+
+.treino-box h4 {
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.treino-box small {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+}
+
+.list-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--panel-soft);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.list-item h4 {
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+
+.list-item p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.list-tag {
+  white-space: nowrap;
+  border: 1px solid rgba(255, 212, 0, 0.35);
+  color: var(--accent);
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+.edu-card,
+.week-card {
+  background: var(--panel);
+  border: 1px solid rgba(255, 212, 0, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.edu-card h3,
+.week-card h3 {
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+.edu-card p,
+.week-card p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.card-status {
+  width: fit-content;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid rgba(184, 187, 199, 0.35);
+  color: var(--muted);
+}
+
+.card-status.ok {
+  border-color: rgba(61, 209, 116, 0.6);
+  color: #75e9a1;
+}
+
+.mini-btn {
+  margin-top: 4px;
+  width: fit-content;
+  border: 1px solid rgba(255, 212, 0, 0.35);
+  background: rgba(255, 212, 0, 0.08);
+  color: var(--accent);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.mini-btn:hover {
+  background: rgba(255, 212, 0, 0.2);
+}
+
+.empty {
+  background: rgba(30, 41, 59, 0.65);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  padding: 14px;
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.25;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  .landing-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .marketing-panel {
+    order: 2;
+  }
+
+  .login-box {
+    order: 1;
+    max-width: none;
+  }
+
+  .painel {
+    padding: 24px 14px 30px;
+  }
+
+  .login-box {
+    padding: 28px 20px;
+  }
+
+  .tabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+  <main class="app">
+    <section class="login-container" id="loginContainer">
+      <div class="landing-shell">
+        <aside class="marketing-panel">
+          <span class="kicker">PROMOCAO DE BOAS-VINDAS</span>
+          <h1>IRON PULSE</h1>
+          <p class="hint left">Treinos de alto nivel, planos acessiveis e acompanhamento inteligente para evoluir de verdade.</p>
+
+          <section class="promo-carousel" aria-label="Promocoes">
+            <article class="promo-slide active" data-slide="0">
+              <strong>100% OFF</strong>
+              <p>No 1o mes para novas assinaturas*</p>
+            </article>
+            <article class="promo-slide" data-slide="1">
+              <strong>Leve 5 amigos por mes</strong>
+              <p>Convidados para treinar com voce em unidades participantes*</p>
+            </article>
+            <article class="promo-slide" data-slide="2">
+              <strong>Combo evolucao</strong>
+              <p>Avaliacao corporal + consultoria de treino por valor reduzido*</p>
+            </article>
+            <div class="promo-dots" id="promoDots">
+              <button type="button" class="dot active" data-dot="0" aria-label="Promo 1"></button>
+              <button type="button" class="dot" data-dot="1" aria-label="Promo 2"></button>
+              <button type="button" class="dot" data-dot="2" aria-label="Promo 3"></button>
+            </div>
+          </section>
+
+          <section class="plan-grid" aria-label="Planos">
+            <article class="plan-card featured">
+              <p class="plan-label">Mais vantajoso</p>
+              <h3>Plano Black</h3>
+              <p class="price">R$ 159,90<span>/mes</span></p>
+              <p class="promo">R$ 0,00 no 1o mes*</p>
+            </article>
+            <article class="plan-card">
+              <h3>Plano Fit</h3>
+              <p class="price">R$ 99,90<span>/mes</span></p>
+              <p class="promo">12 meses de fidelidade</p>
+            </article>
+            <article class="plan-card">
+              <h3>Plano Smart</h3>
+              <p class="price">R$ 119,90<span>/mes</span></p>
+              <p class="promo">Sem fidelidade</p>
+            </article>
+          </section>
+          <p class="legal-note">*Valores e condicoes podem variar por unidade.</p>
+        </aside>
+
+        <div class="login-box">
+          <h2>Acesse sua conta</h2>
+          <p class="hint">Admin, professor e aluno no mesmo ambiente.</p>
+
+          <div class="tabs">
+            <button id="tabLogin" class="tab active" type="button">Login</button>
+            <button id="tabSignup" class="tab" type="button">Cadastrar aluno</button>
+          </div>
+
+          <form id="loginForm" class="form active" novalidate>
+            <div class="input-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" required>
+            </div>
+
+            <div class="input-group">
+              <label for="senha">Senha</label>
+              <input type="password" id="senha" required>
+            </div>
+
+            <button class="btn" type="submit">Entrar</button>
+          </form>
+
+          <form id="signupForm" class="form" novalidate>
+            <div class="input-group">
+              <label for="nomeCadastro">Nome</label>
+              <input type="text" id="nomeCadastro" required>
+            </div>
+
+            <div class="input-group">
+              <label for="emailCadastro">Email</label>
+              <input type="email" id="emailCadastro" required>
+            </div>
+
+            <div class="input-group">
+              <label for="senhaCadastro">Senha</label>
+              <div class="field-inline">
+                <input type="password" id="senhaCadastro" required>
+                <button type="button" class="field-toggle" data-toggle-target="senhaCadastro">Mostrar</button>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="senhaCadastro2">Confirmar senha</label>
+              <div class="field-inline">
+                <input type="password" id="senhaCadastro2" required>
+                <button type="button" class="field-toggle" data-toggle-target="senhaCadastro2">Mostrar</button>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="professorCadastro">Treinador responsavel (opcional)</label>
+              <select id="professorCadastro">
+                <option value="">Sem treinador por enquanto</option>
+              </select>
+            </div>
+
+            <section class="signup-health" aria-live="polite">
+              <div class="strength-meter">
+                <span id="passStrengthFill"></span>
+              </div>
+              <p id="passStrengthText" class="field-hint">Seguranca da senha: aguardando preenchimento</p>
+              <p id="emailHint" class="field-hint">Digite um e-mail valido para continuar.</p>
+              <ul class="requirement-list">
+                <li id="reqLen">Minimo de 8 caracteres</li>
+                <li id="reqCase">Letra maiuscula e minuscula</li>
+                <li id="reqNum">Pelo menos 1 numero</li>
+                <li id="reqSpecial">Pelo menos 1 caractere especial</li>
+                <li id="reqMatch">Confirmacao igual a senha</li>
+              </ul>
+            </section>
+
+            <button class="btn" id="signupSubmitBtn" type="submit" disabled>Criar conta</button>
+          </form>
+
+          <p class="msg" id="msg"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="painel" id="adminPanel">
+      <div class="topo">
+        <h1>Painel Administrador</h1>
+        <button class="logout" id="adminLogout" type="button">Sair</button>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Total de Professores</h3>
+          <p id="statProfessores">0 professores ativos</p>
+        </div>
+
+        <div class="card">
+          <h3>Total de Alunos</h3>
+          <p id="statAlunos">0 alunos cadastrados</p>
+        </div>
+
+        <div class="card">
+          <h3>Treinos Ativos</h3>
+          <p id="statTreinos">0 fichas cadastradas</p>
+        </div>
+      </div>
+
+      <h2 class="titulo">Treinos Recentes</h2>
+      <div class="card">
+        <div class="input-group">
+          <label for="filtroProfessorAdmin">Filtrar por professor</label>
+          <select id="filtroProfessorAdmin">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div id="listaTreinosAdmin"></div>
+      </div>
+    </section>
+
+    <section class="painel" id="professorPanel">
+      <div class="topo">
+        <h1 id="nomeProfessor">Area do Professor</h1>
+        <button class="logout" id="professorLogout" type="button">Sair</button>
+      </div>
+
+      <h2 class="titulo">Meus Alunos</h2>
+      <div class="input-group">
+        <label for="filtroAlunoProfessor">Buscar aluno</label>
+        <input type="text" id="filtroAlunoProfessor" placeholder="Digite o nome do aluno">
+      </div>
+      <div id="listaProfessor"></div>
+
+      <h2 class="titulo">Criar Ficha</h2>
+      <div class="card">
+        <div class="input-group">
+          <label for="alunoTreino">Aluno</label>
+          <select id="alunoTreino"></select>
+        </div>
+
+        <div class="input-group">
+          <label for="tituloTreino">Titulo do treino</label>
+          <input type="text" id="tituloTreino" placeholder="Ex: Hipertrofia A">
+        </div>
+
+        <div class="input-group">
+          <label for="descricaoTreino">Exercicios</label>
+          <textarea id="descricaoTreino" rows="6" placeholder="Exercicios..."></textarea>
+        </div>
+
+        <button class="btn" id="salvarTreinoBtn" type="button">Salvar Treino</button>
+        <p class="msg inline" id="msgProfessor"></p>
+
+        <div id="treinosSalvos"></div>
+      </div>
+    </section>
+
+    <section class="painel" id="alunoPanel">
+      <div class="topo">
+        <h1>Area do Aluno</h1>
+        <button class="logout" id="alunoLogout" type="button">Sair</button>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <h3>Treino Atual</h3>
+          <p id="alunoTreinoAtual">Sem treino</p>
+        </div>
+
+        <div class="card">
+          <h3>Evolucao</h3>
+          <p id="alunoEvolucao">Sem dados de evolucao</p>
+        </div>
+
+        <div class="card">
+          <h3>Professor</h3>
+          <p id="alunoProfessor">Nao definido</p>
+        </div>
+      </div>
+
+      <h2 class="titulo">Ensino de Treinos</h2>
+      <div id="cardsEnsinoAluno" class="cards"></div>
+
+      <h2 class="titulo">Programacao Semanal da Academia</h2>
+      <div id="programacaoSemanalAluno" class="cards"></div>
+
+      <h2 class="titulo">Historico de Fichas</h2>
+      <div id="listaFichasAluno"></div>
+    </section>
+  </main>
+
+  <script>
+const STORAGE_KEY = "iron_pulse_state_v1";
+const SESSION_KEY = "iron_pulse_session_v1";
+
+const seedState = {
+  admin: {
+    nome: "Administrador",
+    email: "admin@ironpulse.com",
+    senha: "123456"
+  },
+  professores: [
+    {
+      nome: "Lucas Trainer",
+      email: "lucas@ironpulse.com",
+      senha: "111111",
+      alunos: ["joao@ironpulse.com", "carlos@ironpulse.com", "bruno@ironpulse.com"]
+    },
+    {
+      nome: "Marina Coach",
+      email: "marina@ironpulse.com",
+      senha: "222222",
+      alunos: ["fernanda@ironpulse.com", "juliana@ironpulse.com", "pedro@ironpulse.com"]
+    }
+  ],
+  alunos: [
+    { nome: "Joao Silva", email: "joao@ironpulse.com", senha: "333333", professorEmail: "lucas@ironpulse.com", evolucao: "+2kg massa magra" },
+    { nome: "Carlos Lima", email: "carlos@ironpulse.com", senha: "333333", professorEmail: "lucas@ironpulse.com", evolucao: "Melhora no cardio" },
+    { nome: "Bruno Alves", email: "bruno@ironpulse.com", senha: "333333", professorEmail: "lucas@ironpulse.com", evolucao: "+8% forca" },
+    { nome: "Fernanda Souza", email: "fernanda@ironpulse.com", senha: "333333", professorEmail: "marina@ironpulse.com", evolucao: "+3kg massa magra" },
+    { nome: "Juliana Rocha", email: "juliana@ironpulse.com", senha: "333333", professorEmail: "marina@ironpulse.com", evolucao: "Mais mobilidade" },
+    { nome: "Pedro Henrique", email: "pedro@ironpulse.com", senha: "333333", professorEmail: "marina@ironpulse.com", evolucao: "Reducao de 2% gordura" }
+  ],
+  treinos: [
+    {
+      id: 1,
+      professorEmail: "lucas@ironpulse.com",
+      alunoEmail: "joao@ironpulse.com",
+      titulo: "Hipertrofia A",
+      descricao: "Supino reto 4x10\nRemada curvada 4x10\nAgachamento 4x12",
+      criadoEm: "2026-05-20"
+    },
+    {
+      id: 2,
+      professorEmail: "marina@ironpulse.com",
+      alunoEmail: "fernanda@ironpulse.com",
+      titulo: "Definicao Full Body",
+      descricao: "Leg press 4x12\nDesenvolvimento 3x12\nPrancha 4x40s",
+      criadoEm: "2026-05-20"
+    }
+  ],
+  agendaSemanal: [
+    { dia: "Segunda", foco: "Musculacao - Membros Superiores", horario: "06:00 - 22:00" },
+    { dia: "Terca", foco: "Treino Funcional", horario: "07:00 - 21:00" },
+    { dia: "Quarta", foco: "Musculacao - Membros Inferiores", horario: "06:00 - 22:00" },
+    { dia: "Quinta", foco: "HIIT e Condicionamento", horario: "07:00 - 21:00" },
+    { dia: "Sexta", foco: "Core e Mobilidade", horario: "06:00 - 22:00" },
+    { dia: "Sabado", foco: "Aula Coletiva e Alongamento", horario: "08:00 - 16:00" },
+    { dia: "Domingo", foco: "Recuperacao Ativa", horario: "08:00 - 13:00" }
+  ],
+  alunoPainel: {}
+};
+
+const $ = (id) => document.getElementById(id);
+const norm = (value) => String(value || "").trim().toLowerCase();
+const today = () => new Date().toISOString().slice(0, 10);
+
+const loginContainer = $("loginContainer");
+const adminPanel = $("adminPanel");
+const professorPanel = $("professorPanel");
+const alunoPanel = $("alunoPanel");
+
+const loginForm = $("loginForm");
+const signupForm = $("signupForm");
+const tabLogin = $("tabLogin");
+const tabSignup = $("tabSignup");
+const msg = $("msg");
+
+const emailInput = $("email");
+const senhaInput = $("senha");
+const nomeCadastro = $("nomeCadastro");
+const emailCadastro = $("emailCadastro");
+const senhaCadastro = $("senhaCadastro");
+const senhaCadastro2 = $("senhaCadastro2");
+const professorCadastro = $("professorCadastro");
+const passStrengthFill = $("passStrengthFill");
+const passStrengthText = $("passStrengthText");
+const emailHint = $("emailHint");
+const signupSubmitBtn = $("signupSubmitBtn");
+const promoDots = $("promoDots");
+const promoSlides = [...document.querySelectorAll(".promo-slide")];
+
+const statProfessores = $("statProfessores");
+const statAlunos = $("statAlunos");
+const statTreinos = $("statTreinos");
+const filtroProfessorAdmin = $("filtroProfessorAdmin");
+const listaTreinosAdmin = $("listaTreinosAdmin");
+
+const nomeProfessor = $("nomeProfessor");
+const listaProfessor = $("listaProfessor");
+const filtroAlunoProfessor = $("filtroAlunoProfessor");
+const alunoTreino = $("alunoTreino");
+const tituloTreino = $("tituloTreino");
+const descricaoTreino = $("descricaoTreino");
+const salvarTreinoBtn = $("salvarTreinoBtn");
+const treinosSalvos = $("treinosSalvos");
+const msgProfessor = $("msgProfessor");
+
+const alunoTreinoAtual = $("alunoTreinoAtual");
+const alunoEvolucao = $("alunoEvolucao");
+const alunoProfessor = $("alunoProfessor");
+const cardsEnsinoAluno = $("cardsEnsinoAluno");
+const programacaoSemanalAluno = $("programacaoSemanalAluno");
+const listaFichasAluno = $("listaFichasAluno");
+
+const adminLogout = $("adminLogout");
+const professorLogout = $("professorLogout");
+const alunoLogout = $("alunoLogout");
+
+let state = loadState();
+let session = null;
+let promoIndex = 0;
+let promoTimer = null;
+
+const signupReqIds = {
+  len: "reqLen",
+  caseMix: "reqCase",
+  number: "reqNum",
+  special: "reqSpecial",
+  match: "reqMatch"
+};
+
+function clone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function loadState() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+    if (!raw || typeof raw !== "object") return clone(seedState);
+
+    const merged = {
+      admin: raw.admin || seedState.admin,
+      professores: Array.isArray(raw.professores) ? raw.professores : clone(seedState.professores),
+      alunos: Array.isArray(raw.alunos) ? raw.alunos : clone(seedState.alunos),
+      treinos: Array.isArray(raw.treinos) ? raw.treinos : clone(seedState.treinos),
+      agendaSemanal: Array.isArray(raw.agendaSemanal) && raw.agendaSemanal.length ? raw.agendaSemanal : clone(seedState.agendaSemanal),
+      alunoPainel: raw.alunoPainel && typeof raw.alunoPainel === "object" ? raw.alunoPainel : {}
+    };
+
+    return merged;
+  } catch {
+    return clone(seedState);
+  }
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function saveSession(nextSession) {
+  session = nextSession;
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
+}
+
+function clearSession() {
+  session = null;
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+function restoreSession() {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
+    if (!raw || !raw.email || !raw.role) return;
+
+    if (raw.role === "admin" && norm(raw.email) === norm(state.admin.email)) {
+      saveSession(raw);
+      openAdmin();
+      return;
+    }
+
+    if (raw.role === "professor") {
+      const professor = state.professores.find((item) => norm(item.email) === norm(raw.email));
+      if (professor) {
+        saveSession({ role: "professor", email: professor.email });
+        openProfessor(professor);
+      }
+      return;
+    }
+
+    if (raw.role === "aluno") {
+      const aluno = state.alunos.find((item) => norm(item.email) === norm(raw.email));
+      if (aluno) {
+        saveSession({ role: "aluno", email: aluno.email });
+        openAluno(aluno);
+      }
+    }
+  } catch {}
+}
+
+function setMode(mode) {
+  const isLogin = mode === "login";
+  tabLogin.classList.toggle("active", isLogin);
+  tabSignup.classList.toggle("active", !isLogin);
+  loginForm.classList.toggle("active", isLogin);
+  signupForm.classList.toggle("active", !isLogin);
+  if (!isLogin) updateSignupInteractivity();
+  setMsg("");
+}
+
+function setMsg(text, type = "") {
+  msg.textContent = text;
+  msg.className = `msg ${type}`.trim();
+}
+
+function setMsgProfessor(text, type = "") {
+  msgProfessor.textContent = text;
+  msgProfessor.className = `msg inline ${type}`.trim();
+}
+
+function hideAllPanels() {
+  stopPromoCarousel();
+  loginContainer.style.display = "none";
+  adminPanel.style.display = "none";
+  professorPanel.style.display = "none";
+  alunoPanel.style.display = "none";
+}
+
+function openLogin() {
+  hideAllPanels();
+  loginContainer.style.display = "flex";
+  emailInput.value = "";
+  senhaInput.value = "";
+  renderSignupProfessores();
+  updateSignupInteractivity();
+  startPromoCarousel();
+  setMsg("");
+}
+
+function setPromoSlide(index) {
+  if (!promoSlides.length) return;
+  promoIndex = (index + promoSlides.length) % promoSlides.length;
+  promoSlides.forEach((slide, idx) => slide.classList.toggle("active", idx === promoIndex));
+  promoDots?.querySelectorAll(".dot").forEach((dot, idx) => dot.classList.toggle("active", idx === promoIndex));
+}
+
+function startPromoCarousel() {
+  if (!promoSlides.length) return;
+  stopPromoCarousel();
+  setPromoSlide(promoIndex);
+  promoTimer = setInterval(() => setPromoSlide(promoIndex + 1), 3800);
+}
+
+function stopPromoCarousel() {
+  if (!promoTimer) return;
+  clearInterval(promoTimer);
+  promoTimer = null;
+}
+
+function openAdmin() {
+  hideAllPanels();
+  adminPanel.style.display = "block";
+  renderAdminStats();
+  renderAdminProfessorFilter();
+  renderAdminTreinosRecentes();
+}
+
+function renderAdminStats() {
+  statProfessores.textContent = `${state.professores.length} professores ativos`;
+  statAlunos.textContent = `${state.alunos.length} alunos cadastrados`;
+  statTreinos.textContent = `${state.treinos.length} fichas cadastradas`;
+}
+
+function renderSignupProfessores() {
+  professorCadastro.innerHTML = '<option value="">Sem treinador por enquanto</option>';
+  state.professores.forEach((professor) => {
+    const option = document.createElement("option");
+    option.value = professor.email;
+    option.textContent = professor.nome;
+    professorCadastro.appendChild(option);
+  });
+}
+
+function renderAdminProfessorFilter() {
+  filtroProfessorAdmin.innerHTML = '<option value="">Todos</option>';
+  state.professores.forEach((professor) => {
+    const option = document.createElement("option");
+    option.value = professor.email;
+    option.textContent = professor.nome;
+    filtroProfessorAdmin.appendChild(option);
+  });
+}
+
+function renderAdminTreinosRecentes() {
+  const filtroEmail = norm(filtroProfessorAdmin.value);
+  const treinos = state.treinos
+    .filter((treino) => !filtroEmail || norm(treino.professorEmail) === filtroEmail)
+    .slice()
+    .sort((a, b) => (a.id < b.id ? 1 : -1))
+    .slice(0, 8);
+
+  if (!treinos.length) {
+    listaTreinosAdmin.innerHTML = '<div class="empty">Nenhuma ficha encontrada para o filtro selecionado.</div>';
+    return;
+  }
+
+  listaTreinosAdmin.innerHTML = `<div class="list-stack">${treinos.map((treino) => {
+    const professor = state.professores.find((item) => norm(item.email) === norm(treino.professorEmail));
+    const aluno = state.alunos.find((item) => norm(item.email) === norm(treino.alunoEmail));
+    return `
+      <article class="list-item">
+        <div>
+          <h4>${treino.titulo}</h4>
+          <p>${aluno ? aluno.nome : "Aluno nao encontrado"} - ${professor ? professor.nome : "Professor nao encontrado"}</p>
+        </div>
+        <span class="list-tag">${treino.criadoEm}</span>
+      </article>
+    `;
+  }).join("")}</div>`;
+}
+
+function openProfessor(professor) {
+  hideAllPanels();
+  professorPanel.style.display = "block";
+  nomeProfessor.textContent = `Professor: ${professor.nome}`;
+  filtroAlunoProfessor.value = "";
+  renderProfessorStudents(professor, "");
+  renderProfessorTreinos(professor);
+  renderAlunoSelect(professor);
+}
+
+function renderProfessorStudents(professor, filtroNome = "") {
+  const meusAlunos = state.alunos.filter((aluno) => professor.alunos.includes(aluno.email));
+  const filtro = norm(filtroNome);
+  const listaFiltrada = meusAlunos.filter((aluno) => !filtro || norm(aluno.nome).includes(filtro));
+
+  if (!listaFiltrada.length) {
+    listaProfessor.innerHTML = '<div class="empty">Nenhum aluno vinculado.</div>';
+    return;
+  }
+
+  listaProfessor.innerHTML = `<div class="list-stack">${listaFiltrada.map((aluno) => {
+    const treinoAtual = latestTreinoByAluno(aluno.email);
+    return `
+      <div class="aluno-item list-item">
+        <div>
+        <h3>${aluno.nome}</h3>
+        <p>${treinoAtual ? `Treino ativo: ${treinoAtual.titulo}` : "Sem treino ativo"}</p>
+        </div>
+        <span class="list-tag">${treinoAtual ? "Ativo" : "Pendente"}</span>
+      </div>
+    `;
+  }).join("")}</div>`;
+}
+
+function renderAlunoSelect(professor) {
+  const meusAlunos = state.alunos.filter((aluno) => professor.alunos.includes(aluno.email));
+
+  alunoTreino.innerHTML = "";
+  if (!meusAlunos.length) {
+    alunoTreino.innerHTML = '<option value="">Sem alunos</option>';
+    return;
+  }
+
+  meusAlunos.forEach((aluno) => {
+    const option = document.createElement("option");
+    option.value = aluno.email;
+    option.textContent = aluno.nome;
+    alunoTreino.appendChild(option);
+  });
+}
+
+function renderProfessorTreinos(professor) {
+  const meusTreinos = state.treinos
+    .filter((treino) => norm(treino.professorEmail) === norm(professor.email))
+    .slice()
+    .sort((a, b) => (a.id < b.id ? 1 : -1));
+
+  if (!meusTreinos.length) {
+    treinosSalvos.innerHTML = '<div class="empty">Nenhuma ficha criada ainda.</div>';
+    return;
+  }
+
+  treinosSalvos.innerHTML = meusTreinos.map((treino) => {
+    const aluno = state.alunos.find((item) => norm(item.email) === norm(treino.alunoEmail));
+    return `
+      <div class="treino-box">
+        <h4>${treino.titulo}</h4>
+        <p><strong>Aluno:</strong> ${aluno ? aluno.nome : "Nao encontrado"}</p>
+        <p>${treino.descricao.replace(/\n/g, "<br>")}</p>
+        <small>Criado em ${treino.criadoEm}</small>
+      </div>
+    `;
+  }).join("");
+}
+
+function slugify(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
+
+function getAlunoPainel(email) {
+  const key = norm(email);
+  if (!state.alunoPainel[key]) {
+    state.alunoPainel[key] = { estudo: {}, semanal: {} };
+  }
+  if (!state.alunoPainel[key].estudo) state.alunoPainel[key].estudo = {};
+  if (!state.alunoPainel[key].semanal) state.alunoPainel[key].semanal = {};
+  return state.alunoPainel[key];
+}
+
+function renderAlunoLearningCards(aluno, treinoAtual) {
+  const painel = getAlunoPainel(aluno.email);
+  const exercicios = String(treinoAtual?.descricao || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 2);
+
+  const cards = [
+    {
+      id: "aquecimento",
+      titulo: "Aquecimento Inteligente",
+      descricao: "Faca 8 a 10 minutos de aquecimento antes do treino para ativar musculatura e reduzir risco de lesao."
+    },
+    {
+      id: "tecnica",
+      titulo: "Tecnica do Treino Atual",
+      descricao: exercicios.length
+        ? `Foco de hoje: ${exercicios.join(" | ")}. Priorize amplitude completa e controle do movimento.`
+        : "Seu treino ainda nao foi cadastrado. Assim que sair sua ficha, aqui entram as orientacoes tecnicas."
+    },
+    {
+      id: "recuperacao",
+      titulo: "Recuperacao Pos-Treino",
+      descricao: "Respeite intervalo, hidratacao e descanso. O resultado vem da consistencia entre treino e recuperacao."
+    }
+  ];
+
+  cardsEnsinoAluno.innerHTML = cards.map((card) => {
+    const done = !!painel.estudo[card.id];
+    return `
+      <article class="edu-card">
+        <span class="card-status ${done ? "ok" : ""}">${done ? "Estudado" : "Pendente"}</span>
+        <h3>${card.titulo}</h3>
+        <p>${card.descricao}</p>
+        <button class="mini-btn" type="button" data-edu-toggle="${card.id}">
+          ${done ? "Marcar como pendente" : "Marcar como estudado"}
+        </button>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderAlunoWeeklySchedule(aluno) {
+  const painel = getAlunoPainel(aluno.email);
+  const agenda = Array.isArray(state.agendaSemanal) ? state.agendaSemanal : [];
+
+  if (!agenda.length) {
+    programacaoSemanalAluno.innerHTML = '<div class="empty">Programacao semanal indisponivel no momento.</div>';
+    return;
+  }
+
+  programacaoSemanalAluno.innerHTML = agenda.map((item) => {
+    const dayKey = slugify(item.dia);
+    const done = !!painel.semanal[dayKey];
+    return `
+      <article class="week-card">
+        <span class="card-status ${done ? "ok" : ""}">${done ? "Concluido" : "Planejado"}</span>
+        <h3>${item.dia}</h3>
+        <p>${item.foco}</p>
+        <p><strong>Horario:</strong> ${item.horario}</p>
+        <button class="mini-btn" type="button" data-week-toggle="${dayKey}">
+          ${done ? "Desmarcar treino do dia" : "Marcar treino realizado"}
+        </button>
+      </article>
+    `;
+  }).join("");
+}
+
+function openAluno(aluno) {
+  hideAllPanels();
+  alunoPanel.style.display = "block";
+
+  const professor = state.professores.find((item) => norm(item.email) === norm(aluno.professorEmail));
+  const treinos = state.treinos
+    .filter((treino) => norm(treino.alunoEmail) === norm(aluno.email))
+    .slice()
+    .sort((a, b) => (a.id < b.id ? 1 : -1));
+  const treinoAtual = treinos[0];
+
+  alunoTreinoAtual.textContent = treinoAtual ? treinoAtual.titulo : "Sem treino definido";
+  alunoEvolucao.textContent = aluno.evolucao || "Sem dados de evolucao";
+  alunoProfessor.textContent = professor ? professor.nome : "Nao definido";
+  renderAlunoLearningCards(aluno, treinoAtual);
+  renderAlunoWeeklySchedule(aluno);
+
+  const historico = treinos.slice(1);
+  if (!historico.length) {
+    listaFichasAluno.innerHTML = '<div class="empty">Sem historico adicional. O treino atual ja esta destacado no topo.</div>';
+    return;
+  }
+
+  listaFichasAluno.innerHTML = historico.map((treino) => `
+    <div class="treino-box">
+      <h4>${treino.titulo}</h4>
+      <p>${treino.descricao.replace(/\n/g, "<br>")}</p>
+      <small>Criado em ${treino.criadoEm}</small>
+    </div>
+  `).join("");
+}
+
+function latestTreinoByAluno(alunoEmail) {
+  return state.treinos
+    .filter((treino) => norm(treino.alunoEmail) === norm(alunoEmail))
+    .sort((a, b) => (a.id < b.id ? 1 : -1))[0] || null;
+}
+
+function doLogin(event) {
+  event.preventDefault();
+
+  const email = norm(emailInput.value);
+  const senha = senhaInput.value.trim();
+
+  if (!email || !senha) {
+    setMsg("Informe e-mail e senha.", "bad");
+    return;
+  }
+
+  if (email === norm(state.admin.email) && senha === state.admin.senha) {
+    setMsg("Acesso administrador liberado.", "ok");
+    saveSession({ role: "admin", email: state.admin.email });
+    openAdmin();
+    return;
+  }
+
+  const professor = state.professores.find((item) => norm(item.email) === email && item.senha === senha);
+  if (professor) {
+    setMsg("Acesso de professor liberado.", "ok");
+    saveSession({ role: "professor", email: professor.email });
+    openProfessor(professor);
+    return;
+  }
+
+  const aluno = state.alunos.find((item) => norm(item.email) === email && item.senha === senha);
+  if (aluno) {
+    setMsg("Acesso de aluno liberado.", "ok");
+    saveSession({ role: "aluno", email: aluno.email });
+    openAluno(aluno);
+    return;
+  }
+
+  setMsg("Login invalido.", "bad");
+}
+
+function doSignup(event) {
+  event.preventDefault();
+
+  const validation = getSignupValidation();
+  if (!validation.nome || !validation.email || !validation.senha || !validation.confirmar) {
+    setMsg("Preencha todos os campos.", "bad");
+    return;
+  }
+
+  if (!validation.emailFormat) {
+    setMsg("Email invalido.", "bad");
+    return;
+  }
+
+  if (!validation.emailFree) {
+    setMsg("Esse email ja esta cadastrado.", "bad");
+    return;
+  }
+
+  if (!validation.passwordValid) {
+    setMsg("Senha fora do padrao minimo de seguranca.", "bad");
+    return;
+  }
+
+  if (!validation.match) {
+    setMsg("As senhas nao conferem.", "bad");
+    return;
+  }
+
+  const professorEmail = norm(professorCadastro.value);
+  state.alunos.push({
+    nome: validation.nome,
+    email: validation.email,
+    senha: validation.senha,
+    professorEmail,
+    evolucao: "Evolucao ainda nao registrada"
+  });
+  if (professorEmail) {
+    const professor = state.professores.find((item) => norm(item.email) === professorEmail);
+    if (professor && !professor.alunos.includes(validation.email)) professor.alunos.push(validation.email);
+  }
+  saveState();
+
+  signupForm.reset();
+  emailInput.value = validation.email;
+  setMode("login");
+  updateSignupInteractivity();
+  setMsg("Conta criada com sucesso.", "ok");
+}
+
+function saveTreino() {
+  if (!session || session.role !== "professor") return;
+
+  const professor = state.professores.find((item) => norm(item.email) === norm(session.email));
+  if (!professor) return;
+
+  const alunoEmail = norm(alunoTreino.value);
+  const titulo = tituloTreino.value.trim();
+  const descricao = descricaoTreino.value.trim();
+
+  if (!alunoEmail || !titulo || !descricao) {
+    setMsgProfessor("Preencha aluno, titulo e exercicios.", "bad");
+    return;
+  }
+
+  if (!professor.alunos.includes(alunoEmail)) {
+    setMsgProfessor("Aluno nao pertence a sua lista.", "bad");
+    return;
+  }
+
+  state.treinos.push({
+    id: Date.now(),
+    professorEmail: professor.email,
+    alunoEmail,
+    titulo,
+    descricao,
+    criadoEm: today()
+  });
+
+  saveState();
+  tituloTreino.value = "";
+  descricaoTreino.value = "";
+  renderAdminStats();
+  renderProfessorStudents(professor);
+  renderProfessorTreinos(professor);
+  renderAdminTreinosRecentes();
+  setMsgProfessor("Treino salvo com sucesso.", "ok");
+}
+
+function doLogout() {
+  clearSession();
+  setMsgProfessor("");
+  openLogin();
+}
+
+function isEmailTaken(email) {
+  const allEmails = [state.admin.email, ...state.professores.map((item) => item.email), ...state.alunos.map((item) => item.email)];
+  return allEmails.some((item) => norm(item) === norm(email));
+}
+
+function getSignupValidation() {
+  const nome = nomeCadastro.value.trim();
+  const email = norm(emailCadastro.value);
+  const senha = senhaCadastro.value;
+  const confirmar = senhaCadastro2.value;
+  const emailFormat = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailFree = emailFormat && !isEmailTaken(email);
+  const len = senha.length >= 8;
+  const caseMix = /[a-z]/.test(senha) && /[A-Z]/.test(senha);
+  const number = /\d/.test(senha);
+  const special = /[^A-Za-z0-9]/.test(senha);
+  const match = senha.length > 0 && senha === confirmar;
+  const passwordValid = len && caseMix && number && special;
+  const strength = [len, caseMix, number, special].filter(Boolean).length;
+  return { nome, email, senha, confirmar, emailFormat, emailFree, len, caseMix, number, special, match, passwordValid, strength };
+}
+
+function setRequirementState(id, ok) {
+  const el = $(id);
+  if (!el) return;
+  el.classList.toggle("ok", !!ok);
+}
+
+function setInputState(input, state) {
+  input.classList.remove("input-ok", "input-bad");
+  if (state === "ok") input.classList.add("input-ok");
+  if (state === "bad") input.classList.add("input-bad");
+}
+
+function updateSignupInteractivity() {
+  const v = getSignupValidation();
+
+  setRequirementState(signupReqIds.len, v.len);
+  setRequirementState(signupReqIds.caseMix, v.caseMix);
+  setRequirementState(signupReqIds.number, v.number);
+  setRequirementState(signupReqIds.special, v.special);
+  setRequirementState(signupReqIds.match, v.match);
+
+  const strengthPct = Math.max(0, Math.min(100, v.strength * 25));
+  passStrengthFill.style.width = `${strengthPct}%`;
+  passStrengthFill.className = "";
+  if (v.strength > 0) passStrengthFill.classList.add(`level-${v.strength}`);
+
+  const strengthLabel = ["muito fraca", "fraca", "media", "forte", "excelente"][v.strength] || "aguardando preenchimento";
+  passStrengthText.textContent = `Seguranca da senha: ${strengthLabel}`;
+  passStrengthText.className = `field-hint ${v.passwordValid ? "ok" : ""}`.trim();
+
+  if (!v.email) {
+    emailHint.textContent = "Digite um e-mail valido para continuar.";
+    emailHint.className = "field-hint";
+    setInputState(emailCadastro, "");
+  } else if (!v.emailFormat) {
+    emailHint.textContent = "Formato de e-mail invalido.";
+    emailHint.className = "field-hint bad";
+    setInputState(emailCadastro, "bad");
+  } else if (!v.emailFree) {
+    emailHint.textContent = "Esse e-mail ja esta em uso.";
+    emailHint.className = "field-hint bad";
+    setInputState(emailCadastro, "bad");
+  } else {
+    emailHint.textContent = "E-mail disponivel para cadastro.";
+    emailHint.className = "field-hint ok";
+    setInputState(emailCadastro, "ok");
+  }
+
+  setInputState(senhaCadastro, v.senha.length ? (v.passwordValid ? "ok" : "bad") : "");
+  setInputState(senhaCadastro2, v.confirmar.length ? (v.match ? "ok" : "bad") : "");
+  setInputState(nomeCadastro, v.nome.length ? "ok" : "");
+
+  signupSubmitBtn.disabled = !(v.nome && v.emailFormat && v.emailFree && v.passwordValid && v.match);
+}
+
+tabLogin.addEventListener("click", () => setMode("login"));
+tabSignup.addEventListener("click", () => setMode("signup"));
+loginForm.addEventListener("submit", doLogin);
+signupForm.addEventListener("submit", doSignup);
+salvarTreinoBtn.addEventListener("click", saveTreino);
+filtroProfessorAdmin.addEventListener("change", renderAdminTreinosRecentes);
+filtroAlunoProfessor.addEventListener("input", () => {
+  if (!session || session.role !== "professor") return;
+  const professor = state.professores.find((item) => norm(item.email) === norm(session.email));
+  if (!professor) return;
+  renderProfessorStudents(professor, filtroAlunoProfessor.value);
+});
+alunoPanel.addEventListener("click", (event) => {
+  if (!session || session.role !== "aluno") return;
+  const aluno = state.alunos.find((item) => norm(item.email) === norm(session.email));
+  if (!aluno) return;
+  const painel = getAlunoPainel(aluno.email);
+
+  const eduBtn = event.target.closest("[data-edu-toggle]");
+  if (eduBtn) {
+    const key = eduBtn.dataset.eduToggle;
+    painel.estudo[key] = !painel.estudo[key];
+    saveState();
+    const treinoAtual = latestTreinoByAluno(aluno.email);
+    renderAlunoLearningCards(aluno, treinoAtual);
+    return;
+  }
+
+  const weekBtn = event.target.closest("[data-week-toggle]");
+  if (weekBtn) {
+    const key = weekBtn.dataset.weekToggle;
+    painel.semanal[key] = !painel.semanal[key];
+    saveState();
+    renderAlunoWeeklySchedule(aluno);
+  }
+});
+
+adminLogout.addEventListener("click", doLogout);
+professorLogout.addEventListener("click", doLogout);
+alunoLogout.addEventListener("click", doLogout);
+promoDots?.addEventListener("click", (event) => {
+  const dot = event.target.closest(".dot[data-dot]");
+  if (!dot) return;
+  const next = Number(dot.dataset.dot);
+  setPromoSlide(next);
+  startPromoCarousel();
+});
+signupForm.addEventListener("input", updateSignupInteractivity);
+signupForm.addEventListener("click", (event) => {
+  const toggle = event.target.closest(".field-toggle[data-toggle-target]");
+  if (!toggle) return;
+  const input = $(toggle.dataset.toggleTarget);
+  if (!input) return;
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  toggle.textContent = show ? "Ocultar" : "Mostrar";
+});
+
+saveState();
+setMode("login");
+openLogin();
+restoreSession();
+
+</script>
+</body>
+</html>
+
