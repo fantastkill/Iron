@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Modal } from '../components/Modal';
 import { Plus, Search, Pencil, Trash2, Dumbbell, Users, ClipboardList } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { exercises } from '../data/seed';
@@ -9,10 +10,22 @@ export default function Professor() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
   const [selected, setSelected] = useState('');
+  const [status, setStatus] = useState('active');
+  const [dayFilter, setDayFilter] = useState('all');
+  const catalogue = [
+    ...new Set([...exercises, ...data.workouts.flatMap((w) => w.exercises.map((e) => e.name))]),
+  ];
   const assigned = data.students.filter((s) => s.teacherId === user.id);
-  const students = assigned.filter((s) => s.name.toLowerCase().includes(query.toLowerCase()));
+  const students = assigned.filter(
+    (s) =>
+      s.name.toLowerCase().includes(query.toLowerCase()) &&
+      (status === 'all' || s.active === (status === 'active')),
+  );
   const workouts = data.workouts.filter(
-    (w) => assigned.some((s) => s.id === w.studentId) && (!selected || w.studentId === selected),
+    (w) =>
+      assigned.some((s) => s.id === w.studentId) &&
+      (!selected || w.studentId === selected) &&
+      (dayFilter === 'all' || w.days.includes(dayFilter)),
   );
   const newExercise = () => ({
     id: crypto.randomUUID(),
@@ -27,7 +40,10 @@ export default function Professor() {
         ? { ...w, exercises: w.exercises.map((e) => ({ ...e })) }
         : {
             title: '',
-            studentId: selected || assigned[0]?.id || data.students[0]?.id || '',
+            studentId:
+              assigned.find((s) => s.id === selected && s.active)?.id ||
+              assigned.find((s) => s.active)?.id ||
+              '',
             days: ['Seg', 'Qua', 'Sex'],
             exercises: [newExercise()],
           },
@@ -68,7 +84,7 @@ export default function Professor() {
             data.workouts.filter((w) => assigned.some((s) => s.id === w.studentId)).length,
             'Fichas dos seus alunos',
           ],
-          [Dumbbell, exercises.length, 'Exercícios no catálogo'],
+          [Dumbbell, catalogue.length, 'Exercícios disponíveis'],
         ].map(([Icon, n, label]) => (
           <Card key={label}>
             <Icon />
@@ -89,6 +105,14 @@ export default function Professor() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
+          </label>
+          <label className="field">
+            Situação do aluno
+            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="active">Ativos</option>
+              <option value="inactive">Inativos</option>
+              <option value="all">Todos</option>
+            </select>
           </label>
           <button
             className={`student-pick ${!selected ? 'chosen' : ''}`}
@@ -123,6 +147,15 @@ export default function Professor() {
                 ? `Treinos de ${data.students.find((s) => s.id === selected)?.name.split(' ')[0]}`
                 : 'Fichas de treino'}
             </h2>
+            <label className="field">
+              Dia da ficha
+              <select value={dayFilter} onChange={(e) => setDayFilter(e.target.value)}>
+                <option value="all">Todos os dias</option>
+                {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((d) => (
+                  <option key={d}>{d}</option>
+                ))}
+              </select>
+            </label>
             <span className="badge">{workouts.length} fichas</span>
           </div>
           {workouts.map((w) => (
@@ -174,7 +207,8 @@ export default function Professor() {
         {data.history.length ? (
           data.history.map((h) => (
             <p key={h.id} className="small">
-              {data.students.find((s) => s.id === h.studentId)?.name} • {h.title} • {h.date}
+              {data.students.find((s) => s.id === h.studentId)?.name} • {h.title} •{' '}
+              {new Date(h.date + 'T12:00:00').toLocaleDateString('pt-BR')}
             </p>
           ))
         ) : (
@@ -182,125 +216,129 @@ export default function Professor() {
         )}
       </Card>
       {editing && (
-        <div className="modal-backdrop">
-          <section
-            className="modal wide"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="workout-title"
-          >
-            <h2 id="workout-title">
-              {editing === 'new' ? 'Nova ficha de treino' : 'Editar ficha'}
-            </h2>
-            <form onSubmit={save}>
-              <Input
-                label="Nome da ficha"
-                placeholder="Treino B • Inferiores"
+        <Modal
+          titleId="workout-title"
+          wide
+          onClose={() => {
+            if (!busy) setEditing(null);
+          }}
+        >
+          <h2 id="workout-title">{editing === 'new' ? 'Nova ficha de treino' : 'Editar ficha'}</h2>
+          <form onSubmit={save}>
+            <Input
+              label="Nome da ficha"
+              placeholder="Treino B • Inferiores"
+              required
+              maxLength={100}
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+            <label className="field">
+              Atribuir ao aluno
+              <select
                 required
-                maxLength={100}
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-              />
-              <label className="field">
-                Atribuir ao aluno
-                <select
-                  required
-                  disabled={editing !== 'new'}
-                  value={form.studentId}
-                  onChange={(e) => setForm({ ...form, studentId: e.target.value })}
-                >
-                  {assigned
-                    .filter((s) => s.active)
-                    .map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <p>Dias da semana</p>
-              <div className="days">
-                {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day) => (
-                  <label key={day}>
-                    <input
-                      type="checkbox"
-                      checked={form.days.includes(day)}
-                      onChange={() =>
-                        setForm({
-                          ...form,
-                          days: form.days.includes(day)
-                            ? form.days.filter((d) => d !== day)
-                            : [...form.days, day],
-                        })
-                      }
-                    />
-                    {day}
-                  </label>
-                ))}
-              </div>
-              {form.exercises.map((ex, i) => (
-                <fieldset className="exercise-editor" key={ex.id}>
-                  <legend>Exercício {i + 1}</legend>
-                  <label className="field">
-                    Exercício
-                    <select
-                      value={ex.name}
-                      onChange={(e) => editExercise(ex.id, 'name', e.target.value)}
-                    >
-                      {exercises.map((x) => (
-                        <option key={x}>{x}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <div className="grid three">
-                    {[
-                      ['sets', 'Séries', 1, 20],
-                      ['reps', 'Repetições', 1, 100],
-                      ['rest', 'Descanso (s)', 0, 600],
-                    ].map(([key, label, min, max]) => (
-                      <Input
-                        key={key}
-                        label={label}
-                        type="number"
-                        min={min}
-                        max={max}
-                        required
-                        value={ex[key]}
-                        onChange={(e) => editExercise(ex.id, key, Number(e.target.value))}
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    disabled={form.exercises.length === 1}
-                    onClick={() =>
-                      setForm({ ...form, exercises: form.exercises.filter((x) => x.id !== ex.id) })
-                    }
-                  >
-                    Remover exercício
-                  </Button>
-                </fieldset>
-              ))}
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setForm({ ...form, exercises: [...form.exercises, newExercise()] })}
+                disabled={editing !== 'new'}
+                value={form.studentId}
+                onChange={(e) => setForm({ ...form, studentId: e.target.value })}
               >
-                <Plus size={17} />
-                Adicionar exercício
+                {assigned
+                  .filter((s) => s.active)
+                  .map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <datalist id="exercise-catalogue">
+              {catalogue.map((name) => (
+                <option key={name} value={name} />
+              ))}
+            </datalist>
+            <p className="small muted">
+              Selecione uma sugestão ou escreva o nome de outro exercício para incluí-lo na ficha.
+            </p>
+            <p>Dias da semana</p>
+            <div className="days">
+              {['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'].map((day) => (
+                <label key={day}>
+                  <input
+                    type="checkbox"
+                    checked={form.days.includes(day)}
+                    onChange={() =>
+                      setForm({
+                        ...form,
+                        days: form.days.includes(day)
+                          ? form.days.filter((d) => d !== day)
+                          : [...form.days, day],
+                      })
+                    }
+                  />
+                  {day}
+                </label>
+              ))}
+            </div>
+            {form.exercises.map((ex, i) => (
+              <fieldset className="exercise-editor" key={ex.id}>
+                <legend>Exercício {i + 1}</legend>
+                <label className="field">
+                  Nome do exercício
+                  <input
+                    list="exercise-catalogue"
+                    required
+                    maxLength={100}
+                    value={ex.name}
+                    onChange={(e) => editExercise(ex.id, 'name', e.target.value)}
+                  />
+                </label>
+                <div className="grid three">
+                  {[
+                    ['sets', 'Séries', 1, 20],
+                    ['reps', 'Repetições', 1, 100],
+                    ['rest', 'Descanso (s)', 0, 600],
+                  ].map(([key, label, min, max]) => (
+                    <Input
+                      key={key}
+                      label={label}
+                      type="number"
+                      min={min}
+                      max={max}
+                      required
+                      value={ex[key]}
+                      onChange={(e) => editExercise(ex.id, key, Number(e.target.value))}
+                    />
+                  ))}
+                </div>
+                <Button
+                  variant="secondary"
+                  type="button"
+                  disabled={form.exercises.length === 1}
+                  onClick={() =>
+                    setForm({ ...form, exercises: form.exercises.filter((x) => x.id !== ex.id) })
+                  }
+                >
+                  Remover exercício
+                </Button>
+              </fieldset>
+            ))}
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setForm({ ...form, exercises: [...form.exercises, newExercise()] })}
+            >
+              <Plus size={17} />
+              Adicionar exercício
+            </Button>
+            <div className="actions form-actions">
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Salvando…' : 'Salvar ficha'}
               </Button>
-              <div className="actions form-actions">
-                <Button type="submit" disabled={busy}>
-                  {busy ? 'Salvando…' : 'Salvar ficha'}
-                </Button>
-                <Button variant="secondary" type="button" onClick={() => setEditing(null)}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </section>
-        </div>
+              <Button variant="secondary" type="button" onClick={() => setEditing(null)}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </>
   );

@@ -45,7 +45,10 @@ export default function Student() {
             IRON {student?.plan || '—'}
             <span className="red-dot" />
           </h2>
-          <small>Plano acadêmico {student ? (student.active ? '• Ativo' : '• Inativo') : ''}</small>
+          <small>
+            Plano selecionado{' '}
+            {student ? (student.active ? '• Cadastro ativo' : '• Cadastro inativo') : ''}
+          </small>
         </Card>
         <Card>
           <span className="eyebrow">QUEM TE ACOMPANHA</span>

@@ -24,7 +24,7 @@ Copie .env.example para .env.local e configure VITE_SUPABASE_URL e VITE_SUPABASE
 
 | Rota após /Iron/# | Conteúdo |
 | --- | --- |
-| / | Academia, planos acadêmicos, depoimentos fictícios, benefícios e FAQ |
+| / | Apresentação, planos de interesse, benefícios da plataforma, jornada de uso e FAQ |
 | /login | Cadastro de aluno, login, confirmação via provedor, recuperação e definição de senha |
 | /admin | Gestão de cadastros, convites, atribuição de professor, planos e consulta autorizada de fichas |
 | /professor | Alunos atribuídos, CRUD de fichas e histórico autorizado |
@@ -114,10 +114,17 @@ Para integração hospedada, siga supabase/SETUP.md, preencha .env.integration.l
 
 Repositório: https://github.com/fantastkill/Iron. Branch de implementação: feat/iron-pulse-platform. Destino: https://fantastkill.github.io/Iron/.
 
-O usuário autorizou publicar **somente após** testes aprovados e autenticação configurada/validada. Essa condição ainda não foi atingida. A configuração recebida do conector GitHub permite leitura, sem push; confira ENTREGA_FINAL.md para o resultado da tentativa de envio por Git e demais bloqueios reais.
+O usuário autorizou publicar **somente após** testes aprovados e autenticação configurada/validada. Essa condição ainda não foi atingida. O GitHub CLI foi autenticado pelo proprietário como fantastkill, com permissão de escrita confirmada. Confira ENTREGA_FINAL.md para o resultado do envio, PR, Actions e os bloqueios externos restantes.
 
 O workflow de publicação é manual e requer Variables públicas Supabase e Secrets de quatro contas de teste dedicadas, descritas no guia. Executa npm ci, testes, validação do ambiente, integração real, build e publica dist. ci.yml revisa a branch/PR sem publicar. Não coloque .env, node_modules, dist, artifacts ou logs no commit.
 
 ## Limitações
 
-Academia, planos e depoimentos continuam acadêmicos; não há pagamentos. Não inserir informações clínicas reais para uma apresentação. O projeto depende de Supabase, SMTP, quotas e conexão configurados pelo proprietário. A revisão não é uma certificação de segurança nem substitui testes no serviço real. Não há confirmação de aprovação pela faculdade. O roteiro e a explicação dos conceitos estão em APRESENTACAO_PROFESSOR.md.
+O contexto acadêmico permanece documentado, sem rótulos desnecessários na interface. Depoimentos e dados comerciais não confirmados foram removidos; preços só aparecem após autorização explícita do administrador. Não há pagamentos. Não inserir informações clínicas reais para uma apresentação. O projeto depende de Supabase, SMTP, quotas e conexão configurados pelo proprietário. A revisão não é uma certificação de segurança nem substitui testes no serviço real. Não há confirmação de aprovação pela faculdade. O roteiro e a explicação dos conceitos estão em APRESENTACAO_PROFESSOR.md.
+
+
+## Refinamento do produto
+
+A Home apresenta o título “TRANSFORME SUA FORÇA. SUPERE SEUS LIMITES.” e não publica depoimentos, contatos ou horários inventados. Os planos são preferências registradas no cadastro; não equivalem a um contrato. Preços sem confirmação aparecem como “Consulte condições”. A migração 202611120002_publish_prices.sql acrescenta a autorização de exibição de preço e atualiza o RPC administrativo. Aplique-a após a migração base.
+
+Administração: filtros por situação/plano e exportação CSV dos cadastros visíveis, com proteção contra fórmulas de planilha. Professor: filtros, exercícios personalizados persistidos na ficha e seleção inicial somente de aluno ativo. Evolução: intervalos personalizados com validação das datas. Modais: foco inicial, navegação de teclado contida, Escape e retorno do foco. Mensagens inesperadas do banco são convertidas para orientações em português.

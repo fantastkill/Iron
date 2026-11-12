@@ -12,7 +12,7 @@ Este guia depende de uma conta e de um projeto Supabase pertencentes ao usuário
 
 ## 2. Banco e autorização
 
-Em um projeto novo, abra SQL Editor e execute integralmente `supabase/migrations/202611120001_iron.sql`. O arquivo usa transação. Não o execute em um banco compartilhado sem revisão; ele cria tabelas com nomes de aplicação e não é um importador do banco legado.
+Em um projeto novo, abra SQL Editor e execute, nesta ordem, `supabase/migrations/202611120001_iron.sql` e `supabase/migrations/202611120002_publish_prices.sql`. Ambos usam transação. Se a primeira migração já foi aplicada, execute somente a segunda. Não o execute em um banco compartilhado sem revisão; ele cria tabelas com nomes de aplicação e não é um importador do banco legado.
 
 A migração cria:
 
@@ -175,3 +175,10 @@ Antes de merge e execução manual, confirme que os fluxos de e-mail e os painé
 ### Definição de senha e refresh de convite
 
 O perfil possui password_ready, atualizado somente por triggers do Auth com base na presença da credencial administrada pelo provedor. Não há cópia de senha ou hash no perfil. Convites sem senha definida ficam sem permissões privadas mesmo após refresh; a interface retorna à definição de senha. Nenhum RPC de navegador permite alterar esse indicador. Na validação hospedada, confirme os triggers de criação e atualização com um convite real.
+
+
+## Conteúdo comercial e preços
+
+A página pública não usa depoimentos, endereços, horários ou ofertas sem confirmação. Os três planos aparecem como preferências de cadastro. Os valores iniciais do banco são referências de desenvolvimento e ficam ocultos na Home: price_published começa falso. Somente um administrador autenticado pode confirmar o preço e autorizar sua exibição em Planos e condições. Desmarcar a autorização retira o valor da página pública. Confirmar preço não implementa contratação ou pagamento.
+
+O painel administrativo permite filtrar e exportar os cadastros autorizados em CSV. Professores podem inserir nomes de exercícios personalizados nas fichas, com validação no banco. A evolução permite escolher datas inicial/final. Os modais têm controle de foco e fechamento por Escape.

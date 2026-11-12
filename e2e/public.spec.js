@@ -1,10 +1,27 @@
 import { test, expect } from '@playwright/test';
-for (const width of [390, 1366]) {
+for (const width of [390, 768, 1366]) {
   test(`Home, cadastro e rotas protegidas em ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('./');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'TRANSFORME SUA FORÇA.SUPERE SEUS LIMITES.',
+    );
+    await expect(page.locator('body')).not.toContainText(
+      /projeto acadêmico|fictíci|demonstrativ|experimente sem cadastro/i,
+    );
+    await expect(page.locator('.price')).toContainText([
+      'Consulte condições',
+      'Consulte condições',
+      'Consulte condições',
+    ]);
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('main')).toBeFocused();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
     await page.screenshot({ path: `artifacts/home-${width}.png`, fullPage: true });
     await expect(page.getByRole('link', { name: 'Escolher Black' })).toBeVisible();
     await page.getByRole('link', { name: 'Escolher Black' }).click();

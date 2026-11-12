@@ -30,6 +30,12 @@ beforeAll(async () => {
   await db.exec(
     readFileSync(new URL('../supabase/migrations/202611120001_iron.sql', import.meta.url), 'utf8'),
   );
+  await db.exec(
+    readFileSync(
+      new URL('../supabase/migrations/202611120002_publish_prices.sql', import.meta.url),
+      'utf8',
+    ),
+  );
   for (const [key, id] of Object.entries(ids).slice(0, 4))
     await db.query(`insert into auth.users(id,email,raw_user_meta_data) values($1,$2,$3)`, [
       id,
@@ -47,6 +53,18 @@ afterAll(async () => {
   await db?.close();
 });
 describe('Migração e RLS executadas em PostgreSQL local (sem Auth hospedado)', () => {
+  it('não publica preços iniciais sem autorização explícita', async () => {
+    expect(
+      (await db.query('select price_published from plans')).rows.every(
+        (p) => p.price_published === false,
+      ),
+    ).toBe(true);
+    await asUser(ids.admin, () => db.query("select admin_update_plan('Fit',109.9,true)"));
+    expect(
+      (await db.query("select price_published from plans where name='Fit'")).rows[0]
+        .price_published,
+    ).toBe(true);
+  });
   it('ignora role enviada pelo cadastro público no metadata', async () => {
     const { rows } = await db.query('select role from profiles where id=$1', [ids.other]);
     expect(rows[0].role).toBe('aluno');

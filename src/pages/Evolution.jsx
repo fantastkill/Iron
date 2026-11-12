@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Modal } from '../components/Modal';
 import { Link } from 'react-router-dom';
 import { Plus, Activity, Flame, Scale, ArrowLeft, Check } from 'lucide-react';
 import {
@@ -15,25 +16,27 @@ import {
 import { useApp } from '../context/AppContext';
 import { today } from '../data/seed';
 import { Button, Card, Input, Empty, PageTitle } from '../components/UI';
+import { daysAgo, displayDate } from '../utils/dates';
 export default function Evolution() {
   const { data, user, mutate, busy, notify } = useApp();
   const [period, setPeriod] = useState(90);
+  const [dateFrom, setDateFrom] = useState(() => daysAgo(90));
+  const [dateTo, setDateTo] = useState(today);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ date: today(), weight: '', waist: '', chest: '' });
-  const cutoff = new Date();
-  cutoff.setDate(cutoff.getDate() - period);
-  const start = cutoff.toLocaleDateString('en-CA');
+  const start = period === 'custom' ? dateFrom : daysAgo(period);
+  const end = period === 'custom' ? dateTo : today();
+  const validRange = Boolean(start && end && start <= end && end <= today());
   const measurements = data.measurements
     .filter((m) => m.studentId === user.id)
     .sort((a, b) => a.date.localeCompare(b.date));
-  const filtered = measurements.filter((m) => m.date >= start);
+  const filtered = measurements.filter((m) => validRange && m.date >= start && m.date <= end);
   const history = data.history
-    .filter((h) => h.studentId === user.id && h.date >= start)
+    .filter((h) => validRange && h.studentId === user.id && h.date >= start && h.date <= end)
     .sort((a, b) => b.date.localeCompare(a.date));
   const weekly = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - 6 + i);
-    const date = d.toLocaleDateString('en-CA');
+    const date = daysAgo(6 - i, validRange ? end : today());
+    const d = new Date(`${date}T12:00:00`);
     return {
       day: d.toLocaleDateString('pt-BR', { weekday: 'short' }),
       treinos: history.filter((h) => h.date === date).length,
@@ -86,14 +89,43 @@ export default function Evolution() {
           <select
             aria-label="Filtrar período"
             value={period}
-            onChange={(e) => setPeriod(Number(e.target.value))}
+            onChange={(e) =>
+              setPeriod(e.target.value === 'custom' ? 'custom' : Number(e.target.value))
+            }
           >
             <option value={30}>Últimos 30 dias</option>
             <option value={90}>Últimos 90 dias</option>
             <option value={365}>Último ano</option>
+            <option value="custom">Datas personalizadas</option>
           </select>
         </label>
       </div>
+      {period === 'custom' && (
+        <div className="filter-bar">
+          <Input
+            label="Data inicial"
+            type="date"
+            required
+            max={dateTo || today()}
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+          />
+          <Input
+            label="Data final"
+            type="date"
+            required
+            min={dateFrom}
+            max={today()}
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+          />
+          {!validRange && (
+            <p className="error" role="alert">
+              Escolha um período válido, com a data inicial anterior à final e sem datas futuras.
+            </p>
+          )}
+        </div>
+      )}
       <div className="grid three metrics">
         {[
           [Flame, history.length, 'Treinos no período'],
@@ -149,7 +181,7 @@ export default function Evolution() {
         <Card>
           <div className="card-heading">
             <h3>Frequência semanal</h3>
-            <span className="badge">Últimos 7 dias</span>
+            <span className="badge">7 dias até {displayDate(validRange ? end : today())}</span>
           </div>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={weekly}>
@@ -219,52 +251,50 @@ export default function Evolution() {
         </Card>
       </div>
       {open && (
-        <div className="modal-backdrop">
-          <section
-            className="modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="measure-title"
-          >
-            <h2 id="measure-title">Registrar medidas</h2>
-            <p className="muted">Suas medidas são visíveis somente para sua conta.</p>
-            <form onSubmit={save}>
+        <Modal
+          titleId="measure-title"
+          onClose={() => {
+            if (!busy) setOpen(false);
+          }}
+        >
+          <h2 id="measure-title">Registrar medidas</h2>
+          <p className="muted">Suas medidas são visíveis somente para sua conta.</p>
+          <form onSubmit={save}>
+            <Input
+              label="Data"
+              type="date"
+              max={today()}
+              required
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+            />
+            {[
+              ['weight', 'Peso (kg)', 20, 350],
+              ['waist', 'Cintura (cm)', 30, 250],
+              ['chest', 'Tórax (cm)', 30, 250],
+            ].map(([key, label, min, max]) => (
               <Input
-                label="Data"
-                type="date"
-                max={today()}
+                key={key}
+                label={label}
+                type="number"
+                min={min}
+                max={max}
+                step="0.1"
                 required
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
+                value={form[key]}
+                onChange={(e) => setForm({ ...form, [key]: e.target.value })}
               />
-              {[
-                ['weight', 'Peso (kg)', 20, 350],
-                ['waist', 'Cintura (cm)', 30, 250],
-                ['chest', 'Tórax (cm)', 30, 250],
-              ].map(([key, label, min, max]) => (
-                <Input
-                  key={key}
-                  label={label}
-                  type="number"
-                  min={min}
-                  max={max}
-                  step="0.1"
-                  required
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                />
-              ))}
-              <div className="actions">
-                <Button type="submit" disabled={busy}>
-                  {busy ? 'Salvando…' : 'Salvar medidas'}
-                </Button>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </section>
-        </div>
+            ))}
+            <div className="actions">
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Salvando…' : 'Salvar medidas'}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </>
   );

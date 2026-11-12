@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { supabase } from '../services/supabase';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowUpRight, Check, Flame, Dumbbell, Users, Clock, ShieldCheck } from 'lucide-react';
 import { Header, Footer } from '../components/Layout';
+const plans = [
+  { name: 'Smart', title: 'O primeiro passo para sua rotina.' },
+  { name: 'Fit', title: 'Constância para seguir em frente.' },
+  { name: 'Black', title: 'Foco no seu próximo objetivo.' },
+];
 export default function Home() {
   const [params] = useSearchParams();
   const [prices, setPrices] = useState({});
@@ -11,18 +16,21 @@ export default function Home() {
     if (supabase)
       void supabase
         .from('plans')
-        .select('name,price')
-        .then(({ data }) => {
-          if (active && data)
+        .select('*')
+        .then(({ data, error }) => {
+          if (active && !error && data)
             setPrices(
               Object.fromEntries(
-                data.map((p) => [
-                  p.name,
-                  Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-                ]),
+                data
+                  .filter((p) => p.price_published === true)
+                  .map((p) => [
+                    p.name,
+                    Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+                  ]),
               ),
             );
-        });
+        })
+        .catch(() => {});
     return () => {
       active = false;
     };
@@ -34,24 +42,22 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="hero">
           <div className="hero-grid" />
           <div className="hero-content">
             <span className="eyebrow">
-              <span className="red-dot" /> MAIS QUE TREINO. TRANSFORMAÇÃO.
+              <span className="red-dot" /> FORÇA. DISCIPLINA. EVOLUÇÃO.
             </span>
-            <h1>
-              O SEU PRÓXIMO
+            <h1 className="hero-title">
+              TRANSFORME SUA FORÇA.
               <br />
-              NÍVEL COMEÇA
-              <br />
-              <em>AQUI.</em>
+              <em>SUPERE SEUS LIMITES.</em>
             </h1>
             <p>
-              Força para ir além. Estrutura para evoluir.
+              Organize seus treinos. Acompanhe cada conquista.
               <br />
-              Uma comunidade que cresce com você.
+              Dê o próximo passo com mais direção.
             </p>
             <div className="actions">
               <Link to="/login?cadastro=1" className="button">
@@ -62,14 +68,10 @@ export default function Home() {
               </Link>
             </div>
             <div className="hero-proof">
-              <div className="avatar-stack">
-                <span>LC</span>
-                <span>AS</span>
-                <span>PR</span>
-              </div>
+              <Check className="proof-icon" />
               <p>
                 <b>Seu ritmo. Sua evolução.</b>
-                <small>Uma experiência fitness completa.</small>
+                <small>Uma rotina construída um treino de cada vez.</small>
               </p>
             </div>
           </div>
@@ -77,21 +79,20 @@ export default function Home() {
             <div className="orbit orbit-one" />
             <div className="orbit orbit-two" />
             <Dumbbell className="hero-dumbbell" strokeWidth={1.25} />
-            <span className="vertical-label">BUILT BY DISCIPLINE</span>
+            <span className="vertical-label">CONSTRUÍDO COM DISCIPLINA</span>
             <div className="floating-card">
               <Flame />
               <div>
-                <strong>100% de atitude</strong>
-                <small>O primeiro passo é seu.</small>
+                <strong>Atitude para começar</strong>
+                <small>Constância para continuar.</small>
               </div>
             </div>
-            <span className="art-number">01 / 06</span>
           </div>
           <div className="hero-bottom">
             <span>
               FORÇA <b>+</b> CONSTÂNCIA <b>+</b> EVOLUÇÃO
             </span>
-            <small>ROLE PARA DESCOBRIR ↓</small>
+            <small>CONTINUE PARA DESCOBRIR ↓</small>
           </div>
         </section>
         <div className="brand-strip">
@@ -102,33 +103,37 @@ export default function Home() {
           <span>SUPERE SEUS LIMITES</span>
         </div>
         <section id="structure" className="home-section">
-          <span className="eyebrow">A ESTRUTURA QUE VOCÊ MERECE</span>
+          <span className="eyebrow">CONHEÇA A IRON PULSE</span>
           <h2>
-            Feita para quem
+            Mais direção.
             <br />
-            quer ir <em>além.</em>
+            Mais <em>constância.</em>
           </h2>
+          <p className="section-intro">
+            A Iron Pulse conecta sua rotina de treino ao acompanhamento da sua evolução. Aluno,
+            professor e equipe trabalham com as informações certas, em um só lugar.
+          </p>
           <div className="grid four">
             {[
               [
                 Dumbbell,
-                'Equipamentos completos',
-                'Musculação, pesos livres e área funcional para cada etapa da sua jornada.',
+                'Treinos organizados',
+                'Consulte os exercícios, as séries, as repetições e os intervalos da sua ficha.',
               ],
               [
                 Users,
-                'Perto de você',
-                'Professores presentes e fichas de treino adaptadas ao seu objetivo.',
+                'Orientação conectada',
+                'Acompanhe as fichas preparadas pelo professor responsável pelo seu treino.',
               ],
               [
                 Clock,
-                'No seu tempo',
-                'Conceito de funcionamento: segunda a sexta, 6h às 23h; sábado, 8h às 16h.',
+                'Rotina no seu ritmo',
+                'Veja sua programação semanal e registre o que você concluiu a cada dia.',
               ],
               [
                 ShieldCheck,
-                'Evolução acompanhada',
-                'Organize seus treinos e acompanhe suas conquistas em um só lugar.',
+                'Evolução com clareza',
+                'Reúna seu histórico e suas medidas para observar sua trajetória ao longo do tempo.',
               ],
             ].map(([Icon, title, text]) => (
               <article className="card feature" key={title}>
@@ -142,53 +147,42 @@ export default function Home() {
         <section id="plans" className="home-section plans">
           <div className="section-heading">
             <div>
-              <span className="eyebrow">INVISTA NA SUA MELHOR VERSÃO</span>
+              <span className="eyebrow">ENCONTRE SEU PONTO DE PARTIDA</span>
               <h2>
-                Seu treino.
+                Seu objetivo.
                 <br />
                 <em>Seu plano.</em>
               </h2>
             </div>
             <p>
-              Valores fictícios para demonstração acadêmica.
-              <br />
-              Sem contratação ou cobrança real.
+              Indique sua preferência ao criar a conta.
+              <br />A seleção não realiza contratação nem cobrança.
             </p>
           </div>
           <div className="grid three">
-            {[
-              [
-                'Smart',
-                '79,90',
-                'O essencial para começar',
-                ['Musculação completa', 'Ficha de treino digital', 'Acesso em horário comercial'],
-              ],
-              [
-                'Fit',
-                '99,90',
-                'Mais possibilidades para evoluir',
-                ['Tudo do Smart', 'Área funcional', 'Acompanhamento mensal'],
-              ],
-              [
-                'Black',
-                '159,90',
-                'A experiência completa',
-                ['Tudo do Fit', 'Avaliação corporal demonstrativa', 'Acesso em todos os horários'],
-              ],
-            ].map(([name, price, subtitle, items]) => (
+            {plans.map(({ name, title }) => (
               <article className={`card plan ${name === 'Fit' ? 'featured' : ''}`} key={name}>
-                {name === 'Fit' && <span className="plan-tag">MAIS ESCOLHIDO</span>}
                 <span className="eyebrow">IRON {name.toUpperCase()}</span>
-                <h3>{subtitle}</h3>
-                <div className="price">
-                  <small>R$</small> {prices[name] || price}
-                  <span>/mês</span>
+                <h3>{title}</h3>
+                <div className={`price ${prices[name] ? '' : 'price-consult'}`}>
+                  {prices[name] ? (
+                    <>
+                      <small>R$</small> {prices[name]}
+                      <span>/mês</span>
+                    </>
+                  ) : (
+                    'Consulte condições'
+                  )}
                 </div>
                 <ul>
-                  {items.map((x) => (
-                    <li key={x}>
+                  {[
+                    'Treinos em um só lugar',
+                    'Histórico de atividades',
+                    'Acompanhamento da evolução',
+                  ].map((item) => (
+                    <li key={item}>
                       <Check size={16} />
-                      {x}
+                      {item}
                     </li>
                   ))}
                 </ul>
@@ -204,61 +198,73 @@ export default function Home() {
           </div>
         </section>
         <section className="home-section">
-          <span className="eyebrow">HISTÓRIAS QUE INSPIRAM</span>
+          <span className="eyebrow">SIMPLES PARA COMEÇAR. CLARO PARA CONTINUAR.</span>
           <h2>
-            O resultado vai além
+            Sua jornada,
             <br />
-            do <em>espelho.</em>
+            <em>passo a passo.</em>
           </h2>
           <div className="grid three">
             {[
               [
-                'Ana Souza',
-                '“Encontrei uma rotina que cabe no meu dia. A cada treino, me sinto mais confiante.”',
+                '01',
+                'Crie sua conta',
+                'Escolha um plano de interesse e organize seu acesso com e-mail e senha.',
               ],
-              ['Lucas Oliveira', '“Ver meus treinos organizados me ajuda a manter a constância.”'],
-              ['Pedro Santos', '“O acompanhamento faz toda a diferença para continuar evoluindo.”'],
-            ].map(([name, quote]) => (
-              <article className="card quote" key={name}>
-                <span className="stars">★★★★★</span>
-                <p>{quote}</p>
-                <strong>{name}</strong>
-                <small>Depoimento fictício • Exemplo acadêmico</small>
+              [
+                '02',
+                'Receba seu treino',
+                'Após o vínculo com um professor, suas fichas ficam disponíveis no painel.',
+              ],
+              [
+                '03',
+                'Acompanhe sua evolução',
+                'Marque os exercícios concluídos, consulte o histórico e registre suas medidas.',
+              ],
+            ].map(([number, title, text]) => (
+              <article className="card journey-card" key={number}>
+                <span className="eyebrow">{number}</span>
+                <h3>{title}</h3>
+                <p>{text}</p>
               </article>
             ))}
           </div>
         </section>
         <section id="faq" className="home-section faq">
           <div>
-            <span className="eyebrow">SEM DÚVIDAS. COM ATITUDE.</span>
+            <span className="eyebrow">CLAREZA PARA DAR O PRIMEIRO PASSO</span>
             <h2>
               Antes do
               <br />
-              <em>primeiro treino.</em>
+              <em>próximo treino.</em>
             </h2>
           </div>
           <div>
             {[
               [
-                'Preciso ter experiência para começar?',
-                'Não. O conceito da academia inclui orientação para iniciantes e fichas adaptadas a cada nível.',
-              ],
-              [
                 'Como funciona a área do aluno?',
-                'Crie sua conta de aluno, confirme o e-mail quando solicitado e entre com sua senha para acompanhar seus treinos e evolução.',
+                'Crie sua conta, confirme o e-mail quando solicitado e entre com sua senha. Suas fichas aparecem após a atribuição de um professor.',
               ],
               [
-                'Os planos podem ser contratados aqui?',
-                'Não. Este é um projeto acadêmico fictício. Os preços são exemplos e não há pagamentos.',
+                'Como meu treino é definido?',
+                'O professor responsável organiza sua ficha com exercícios, séries, repetições, intervalos e dias da semana.',
               ],
               [
-                'Meus dados ficam salvos?',
-                'Quando o serviço está configurado, seus dados são vinculados à sua conta no banco. Entre com a mesma conta para acessá-los em outros dispositivos.',
+                'Escolher um plano gera uma cobrança?',
+                'Não. A seleção registra seu interesse. A contratação e suas condições precisam ser confirmadas com a equipe responsável. Não há pagamento pelo site.',
               ],
-            ].map(([q, a]) => (
-              <details key={q}>
-                <summary>{q}</summary>
-                <p>{a}</p>
+              [
+                'Posso consultar meus registros em outro dispositivo?',
+                'Sim. Com o acesso disponível, entre com a mesma conta para consultar os registros salvos.',
+              ],
+              [
+                'Quem pode consultar meus dados?',
+                'Você acessa seus próprios registros. O professor consulta os treinos dos alunos sob sua responsabilidade. Medidas corporais são privadas, e a consulta administrativa dos treinos depende da sua autorização.',
+              ],
+            ].map(([question, answer]) => (
+              <details key={question}>
+                <summary>{question}</summary>
+                <p>{answer}</p>
               </details>
             ))}
           </div>
@@ -266,12 +272,12 @@ export default function Home() {
         <section className="cta-band">
           <Flame size={40} />
           <h2>
-            A mudança começa
+            O próximo passo
             <br />
-            com uma decisão.
+            começa com você.
           </h2>
-          <Link className="button light" to="/login">
-            Explore a experiência <ArrowUpRight size={18} />
+          <Link className="button light" to="/login?cadastro=1">
+            Criar minha conta <ArrowUpRight size={18} />
           </Link>
         </section>
       </main>

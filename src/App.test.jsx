@@ -9,6 +9,8 @@ import Home from './pages/Home';
 import Professor from './pages/Professor';
 import Student from './pages/Student';
 import Evolution from './pages/Evolution';
+import Admin from './pages/Admin';
+import { today } from './data/seed';
 import { createApi } from './services/api';
 import { AuthReturn } from './components/AuthReturn';
 import { finishAuthRedirect } from './services/supabase';
@@ -39,6 +41,7 @@ const person = (id, role, extra = {}) => ({
   ...extra,
 });
 function mockClient(profile = null, records = {}) {
+  const writes = [];
   let session = profile ? { user: { id: profile.id } } : null;
   let handler = () => {};
   const rows = {
@@ -75,6 +78,7 @@ function mockClient(profile = null, records = {}) {
     updateUser: vi.fn(async () => ({ data: { user: {} }, error: null })),
   };
   const client = {
+    writes,
     auth,
     from: vi.fn((table) => {
       let id;
@@ -87,7 +91,10 @@ function mockClient(profile = null, records = {}) {
         single: async () => ({ data: rows[table].find((p) => p.id === id), error: null }),
         then: (resolve, reject) =>
           Promise.resolve({ data: rows[table], error: null }).then(resolve, reject),
-        upsert: vi.fn(async () => ({ error: null })),
+        upsert: vi.fn(async (value) => {
+          writes.push({ table, value });
+          return { error: null };
+        }),
         delete: () => ({ eq: vi.fn(async () => ({ error: null })) }),
       };
       return query;
@@ -116,7 +123,7 @@ function mount(Page, client = null, path = '/login', minimalHome = false) {
             </Route>
           </Route>
           <Route element={<ProtectedRoute roles={['admin']} />}>
-            <Route path="/admin" element={<p>Painel admin</p>} />
+            <Route path="/admin" element={Page ? <Page /> : <p>Painel admin</p>} />
           </Route>
           <Route element={<ProtectedRoute roles={['professor']} />}>
             <Route path="/professor" element={Page ? <Page /> : <p>Painel professor</p>} />
@@ -138,6 +145,62 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe('Interface e contratos de autenticação (SDK mockado; não substitui integração)', () => {
+  it('filtra cadastros administrativos por situação e plano', async () => {
+    const admin = person('a', 'admin');
+    mount(
+      Admin,
+      mockClient(admin, {
+        profiles: [
+          admin,
+          person('s1', 'aluno', { name: 'Aluno ativo', plan: 'Fit' }),
+          person('s2', 'aluno', { name: 'Aluno inativo', active: false, plan: 'Black' }),
+        ],
+      }),
+      '/admin',
+    );
+    expect(await screen.findByText('Aluno ativo')).toBeTruthy();
+    fill('Filtrar situação', 'inactive');
+    expect(screen.queryByText('Aluno ativo')).toBeNull();
+    expect(screen.getByText('Aluno inativo')).toBeTruthy();
+    fill('Filtrar plano', 'Fit');
+    expect(screen.getByText(/Nenhum registro encontrado/)).toBeTruthy();
+  });
+  it('salva um exercício personalizado na ficha do aluno atribuído', async () => {
+    const t = person('t', 'professor');
+    const c = mockClient(t, { profiles: [t, person('s', 'aluno', { teacher_id: 't' })] });
+    mount(Professor, c, '/professor');
+    fireEvent.click(await screen.findByRole('button', { name: 'Criar ficha' }));
+    fill('Nome da ficha', 'Treino funcional');
+    fill('Nome do exercício', 'Agachamento com kettlebell');
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar ficha' }));
+    await waitFor(() => expect(c.writes).toHaveLength(1));
+    expect(c.writes[0].value.student_id).toBe('s');
+    expect(c.writes[0].value.exercises[0].name).toBe('Agachamento com kettlebell');
+  });
+  it('foca o modal e devolve o foco ao fechar com Escape', async () => {
+    const t = person('t', 'professor');
+    mount(
+      Professor,
+      mockClient(t, { profiles: [t, person('s', 'aluno', { teacher_id: 't' })] }),
+      '/professor',
+    );
+    const trigger = await screen.findByRole('button', { name: 'Criar ficha' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    const input = screen.getByLabelText('Nome da ficha');
+    expect(document.activeElement).toBe(input);
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+  });
+  it('valida datas personalizadas na evolução', async () => {
+    mount(null, mockClient(person('s', 'aluno')), '/evolucao');
+    await screen.findByText('Registro de medidas');
+    fill('Filtrar período', 'custom');
+    fill('Data inicial', '9999-01-01');
+    fill('Data final', today());
+    expect(screen.getByRole('alert').textContent).toContain('Escolha um período válido');
+  });
   it('retorno por query navega pelo HashRouter após validar o perfil', async () => {
     window.history.replaceState({}, '', '/Iron/?code=one-time');
     mount(null, mockClient(person('s', 'aluno')), '/', true);

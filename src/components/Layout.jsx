@@ -3,7 +3,7 @@ import { NavLink, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Dumbbell, LayoutDashboard, Users, Activity, LogOut, ArrowUpRight } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 export const Logo = () => (
-  <Link to="/" className="logo">
+  <Link to="/" className="logo" aria-label="Iron Pulse Gym — início">
     <Dumbbell size={30} />
     <span>
       IRON PULSE<small>GYM & PERFORMANCE</small>
@@ -14,6 +14,16 @@ export function Header() {
   const { user } = useApp();
   return (
     <header className="header">
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById('main-content')?.focus();
+        }}
+      >
+        Ir para o conteúdo
+      </a>
       <Logo />
       <nav>
         <Link to="/?section=structure">A academia</Link>
@@ -31,10 +41,15 @@ export function Footer() {
     <footer>
       <Logo />
       <p>Disciplina hoje. Sua melhor versão amanhã.</p>
+      <nav aria-label="Navegação do rodapé">
+        <Link to="/?section=structure">Conheça a Iron Pulse</Link>
+        <Link to="/?section=plans">Planos</Link>
+        <Link to="/?section=faq">Perguntas frequentes</Link>
+        <Link to="/login">Acessar minha conta</Link>
+      </nav>
       <small>
-        Projeto acadêmico • Academia, preços e depoimentos fictícios • Sem pagamentos reais.
+        © {new Date().getFullYear()} IRON PULSE GYM. Sua rotina de treino em um só lugar.
       </small>
-      <p>Contato demonstrativo: contato@ironpulse.example • São Paulo, SP</p>
     </footer>
   );
 }
@@ -113,11 +128,11 @@ export function Layout() {
             </span>
           </div>
         </div>
-        <main className="dashboard">
+        <main className="dashboard" id="main-content" tabIndex={-1}>
           <Outlet />
         </main>
         <div className="dashboard-footer">
-          IRON PULSE GYM <span>Projeto acadêmico • Área privada</span>
+          IRON PULSE GYM <span>Disciplina em cada treino.</span>
         </div>
       </div>
     </div>

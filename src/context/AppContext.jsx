@@ -1,6 +1,7 @@
 ﻿import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase, callbackUrl, finishAuthRedirect } from '../services/supabase';
 import { createApi, emptyData } from '../services/api';
+import { friendlyError } from '../utils/errors';
 const Context = createContext();
 const redirects = new WeakMap();
 export function AppProvider({ children, client = supabase }) {
@@ -18,6 +19,7 @@ export function AppProvider({ children, client = supabase }) {
   const [busy, setBusy] = useState(false);
   const identity = useRef(null);
   const mutationLock = useRef(false);
+  const dataVersion = useRef(0);
   // Nenhuma credencial ou papel é lido do antigo localStorage demonstrativo.
   // O SDK administra a sessão; perfil e permissões vêm do banco protegido por RLS.
   useEffect(() => {
@@ -26,6 +28,7 @@ export function AppProvider({ children, client = supabase }) {
     let version = 0;
     async function sync(session) {
       const current = ++version;
+      dataVersion.current++;
       const id = session?.user?.id || null;
       identity.current = id;
       setLoading(true);
@@ -51,7 +54,12 @@ export function AppProvider({ children, client = supabase }) {
         }
       } catch (err) {
         if (!disposed && current === version)
-          setAuthError(err.message || 'Não foi possível carregar seu perfil.');
+          setAuthError(
+            friendlyError(
+              err,
+              'Não foi possível carregar seu perfil. Entre novamente ou tente mais tarde.',
+            ),
+          );
       } finally {
         if (!disposed && current === version) setLoading(false);
       }
@@ -76,7 +84,9 @@ export function AppProvider({ children, client = supabase }) {
       } catch (err) {
         if (!disposed) {
           setLoading(false);
-          setAuthError(err.message || 'Link de acesso inválido ou expirado.');
+          setAuthError(
+            friendlyError(err, 'Link de acesso inválido ou expirado. Solicite um novo link.'),
+          );
         }
       }
     }
@@ -91,9 +101,28 @@ export function AppProvider({ children, client = supabase }) {
     if (!user || !api) return;
     let active = true;
     const refresh = async () => {
+      if (mutationLock.current) return;
+      const request = ++dataVersion.current;
       try {
-        const next = await api.load();
-        if (active && identity.current === user.id) setData(next);
+        const [next, profile] = await Promise.all([api.load(), api.profile(user.id)]);
+        if (
+          active &&
+          identity.current === user.id &&
+          request === dataVersion.current &&
+          !mutationLock.current
+        ) {
+          if (!profile.active) {
+            setUser(null);
+            setData(emptyData());
+            setAuthError('Conta inativa ou sem perfil autorizado. Contate a administração.');
+            return;
+          }
+          if (!profile.passwordReady) setRecovery(true);
+          setData(next);
+          setUser((previous) =>
+            JSON.stringify(previous) === JSON.stringify(profile) ? previous : profile,
+          );
+        }
       } catch {
         if (active) setNotice('Não foi possível atualizar os dados. Verifique sua conexão.');
       }
@@ -115,16 +144,21 @@ export function AppProvider({ children, client = supabase }) {
   async function mutate(task, success) {
     if (!api || mutationLock.current) return false;
     mutationLock.current = true;
+    dataVersion.current++;
     setBusy(true);
     const current = identity.current;
     try {
       await task(api);
-      const next = await api.load();
-      if (identity.current === current) setData(next);
-      if (success) setNotice(success);
+      try {
+        const next = await api.load();
+        if (identity.current === current) setData(next);
+        if (success) setNotice(success);
+      } catch {
+        setNotice('Alteração salva. Atualize a página para consultar os dados mais recentes.');
+      }
       return true;
     } catch (err) {
-      setNotice(err.message || 'Operação não concluída. Tente novamente.');
+      setNotice(friendlyError(err));
       return false;
     } finally {
       mutationLock.current = false;

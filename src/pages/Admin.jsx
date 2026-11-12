@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Modal } from '../components/Modal';
 import {
   Users,
   Dumbbell,
@@ -10,18 +11,24 @@ import {
   Trash2,
 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+import { peopleCsv, downloadReport } from '../utils/reports';
 import { useApp } from '../context/AppContext';
 import { Button, Card, Input, Empty, PageTitle } from '../components/UI';
 export default function Admin() {
   const { data, mutate, busy } = useApp();
   const [tab, setTab] = useState('students');
   const [query, setQuery] = useState('');
+  const [status, setStatus] = useState('all');
+  const [planFilter, setPlanFilter] = useState('all');
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState('');
   const [form, setForm] = useState({});
   const people = data[tab];
-  const filtered = people.filter((p) =>
-    `${p.name} ${p.email}`.toLowerCase().includes(query.toLowerCase()),
+  const filtered = people.filter(
+    (p) =>
+      `${p.name} ${p.email}`.toLowerCase().includes(query.toLowerCase()) &&
+      (status === 'all' || p.active === (status === 'active')) &&
+      (tab === 'teachers' || planFilter === 'all' || p.plan === planFilter),
   );
   function open(person) {
     setError('');
@@ -77,7 +84,7 @@ export default function Admin() {
         {[
           [Users, data.students.length, 'Alunos cadastrados'],
           [GraduationCap, data.teachers.length, 'Professores'],
-          [Dumbbell, data.workouts.length, 'Fichas de treino'],
+          [Dumbbell, data.workouts.length, 'Fichas autorizadas'],
           [Activity, data.students.filter((s) => s.active).length, 'Alunos ativos'],
         ].map(([Icon, n, label]) => (
           <Card key={label}>
@@ -118,7 +125,7 @@ export default function Admin() {
           </h3>
           <div className="activity-number">
             {data.history.length}
-            <span>treinos registrados</span>
+            <span>treinos com consulta autorizada</span>
           </div>
           <p>{data.students.filter((s) => !s.teacherId).length} aluno(s) aguardando professor.</p>
           <p>
@@ -165,6 +172,47 @@ export default function Admin() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </label>
+        <div className="filter-bar">
+          <label className="field">
+            Situação
+            <select
+              aria-label="Filtrar situação"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="all">Todos</option>
+              <option value="active">Ativos</option>
+              <option value="inactive">Inativos</option>
+            </select>
+          </label>
+          {tab === 'students' && (
+            <label className="field">
+              Plano
+              <select
+                aria-label="Filtrar plano"
+                value={planFilter}
+                onChange={(e) => setPlanFilter(e.target.value)}
+              >
+                <option value="all">Todos os planos</option>
+                {['Smart', 'Fit', 'Black'].map((p) => (
+                  <option key={p}>{p}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          <Button
+            variant="secondary"
+            onClick={() =>
+              downloadReport(
+                peopleCsv(filtered, data.teachers),
+                `iron-pulse-${tab === 'students' ? 'alunos' : 'professores'}.csv`,
+              )
+            }
+            disabled={!filtered.length}
+          >
+            Exportar cadastros
+          </Button>
+        </div>
         <div className="table-wrap">
           <table>
             <thead>
@@ -204,10 +252,18 @@ export default function Admin() {
                   )}
                   <td>
                     <div className="row-actions">
-                      <button aria-label={`Editar ${p.name}`} onClick={() => open(p)}>
+                      <button
+                        disabled={busy}
+                        aria-label={`Editar ${p.name}`}
+                        onClick={() => open(p)}
+                      >
                         <Pencil size={16} />
                       </button>
-                      <button aria-label={`Excluir ${p.name}`} onClick={() => remove(p)}>
+                      <button
+                        disabled={busy}
+                        aria-label={`Excluir ${p.name}`}
+                        onClick={() => remove(p)}
+                      >
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -223,18 +279,23 @@ export default function Admin() {
         <p className="table-caption">{filtered.length} registro(s) • Contas registradas</p>
       </Card>
       <Card className="form-actions">
-        <h3>Planos acadêmicos</h3>
+        <h3>Planos e condições</h3>
         <p className="muted small">
-          Valores de referência, sem cobrança. Alterações aparecem na Home.
+          Confirme o valor e marque a autorização para exibir o preço na página inicial.
         </p>
         {data.plans.map((plan) => (
           <form
             className="plan-management"
-            key={plan.name}
+            key={`${plan.name}-${plan.price}-${plan.price_published}`}
             onSubmit={async (e) => {
               e.preventDefault();
-              const price = new FormData(e.currentTarget).get('price');
-              await mutate((api) => api.savePlan({ ...plan, price }), 'Preço do plano atualizado.');
+              const fields = new FormData(e.currentTarget);
+              const price = fields.get('price');
+              const price_published = fields.get('published') === 'on';
+              await mutate(
+                (api) => api.savePlan({ ...plan, price, price_published }),
+                'Preço do plano atualizado.',
+              );
             }}
           >
             <b>{plan.name}</b>
@@ -248,6 +309,14 @@ export default function Admin() {
               defaultValue={plan.price}
               required
             />
+            <label className="check-label">
+              <input
+                type="checkbox"
+                name="published"
+                defaultChecked={plan.price_published === true}
+              />
+              Autorizo exibir este preço
+            </label>
             <Button disabled={busy}>Atualizar</Button>
           </form>
         ))}
@@ -284,78 +353,81 @@ export default function Admin() {
         )}
       </Card>
       {editing && (
-        <div className="modal-backdrop">
-          <section className="modal" role="dialog" aria-modal="true" aria-labelledby="person-title">
-            <h2 id="person-title">{editing === 'new' ? 'Novo cadastro' : 'Editar cadastro'}</h2>
-            <form onSubmit={save}>
-              <Input
-                label="Nome completo"
-                required
-                maxLength={80}
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-              <Input
-                label="E-mail"
-                disabled={editing !== 'new'}
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-              {tab === 'students' && (
-                <>
-                  <label className="field">
-                    Professor
-                    <select
-                      value={form.teacherId}
-                      onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
-                    >
-                      <option value="">Não atribuído</option>
-                      {data.teachers.map((t) => (
-                        <option value={t.id} key={t.id}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="field">
-                    Plano
-                    <select
-                      value={form.plan}
-                      onChange={(e) => setForm({ ...form, plan: e.target.value })}
-                    >
-                      {['Smart', 'Fit', 'Black'].map((x) => (
-                        <option key={x}>{x}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="check-label">
-                    <input
-                      type="checkbox"
-                      checked={form.active}
-                      onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                    />
-                    Aluno ativo
-                  </label>
-                </>
-              )}
-              {error && (
-                <p className="error" role="alert">
-                  {error}
-                </p>
-              )}
-              <div className="actions">
-                <Button type="submit" disabled={busy}>
-                  {busy ? 'Salvando…' : editing === 'new' ? 'Enviar convite' : 'Salvar cadastro'}
-                </Button>
-                <Button type="button" variant="secondary" onClick={() => setEditing(null)}>
-                  Cancelar
-                </Button>
-              </div>
-            </form>
-          </section>
-        </div>
+        <Modal
+          titleId="person-title"
+          onClose={() => {
+            if (!busy) setEditing(null);
+          }}
+        >
+          <h2 id="person-title">{editing === 'new' ? 'Novo cadastro' : 'Editar cadastro'}</h2>
+          <form onSubmit={save}>
+            <Input
+              label="Nome completo"
+              required
+              maxLength={80}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+            />
+            <Input
+              label="E-mail"
+              disabled={editing !== 'new'}
+              type="email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+            {tab === 'students' && (
+              <>
+                <label className="field">
+                  Professor
+                  <select
+                    value={form.teacherId}
+                    onChange={(e) => setForm({ ...form, teacherId: e.target.value })}
+                  >
+                    <option value="">Não atribuído</option>
+                    {data.teachers.map((t) => (
+                      <option value={t.id} key={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="field">
+                  Plano
+                  <select
+                    value={form.plan}
+                    onChange={(e) => setForm({ ...form, plan: e.target.value })}
+                  >
+                    {['Smart', 'Fit', 'Black'].map((x) => (
+                      <option key={x}>{x}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  />
+                  Aluno ativo
+                </label>
+              </>
+            )}
+            {error && (
+              <p className="error" role="alert">
+                {error}
+              </p>
+            )}
+            <div className="actions">
+              <Button type="submit" disabled={busy}>
+                {busy ? 'Salvando…' : editing === 'new' ? 'Enviar convite' : 'Salvar cadastro'}
+              </Button>
+              <Button type="button" variant="secondary" onClick={() => setEditing(null)}>
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </Modal>
       )}
     </>
   );

@@ -123,7 +123,11 @@ export function createApi(client) {
     deletePerson: async (id) => manageUsers(client, { action: 'delete', id }),
     savePlan: async (plan) =>
       check(
-        await client.rpc('admin_update_plan', { p_name: plan.name, p_price: Number(plan.price) }),
+        await client.rpc('admin_update_plan', {
+          p_name: plan.name,
+          p_price: Number(plan.price),
+          p_published: Boolean(plan.price_published),
+        }),
       ),
     saveWorkout: async (w) =>
       check(

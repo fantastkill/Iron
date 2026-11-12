@@ -2321,3 +2321,109 @@ td small {
     transition: none !important;
   }
 }
+.hero .hero-title {
+  font-size: clamp(46px, 5.4vw, 78px);
+  line-height: 1.03;
+  max-width: 650px;
+}
+.section-intro {
+  max-width: 680px;
+  font-size: 14px;
+  line-height: 1.9;
+  margin-bottom: 32px;
+}
+.hero-proof .proof-icon {
+  color: var(--red);
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: 1px solid #ef3b3b55;
+  border-radius: 50%;
+}
+.price.price-consult {
+  font-size: 26px;
+  letter-spacing: -0.5px;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+}
+.journey-card p {
+  font-size: 13px;
+  line-height: 1.9;
+  margin-bottom: 0;
+}
+footer nav {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: #b6b7bc;
+}
+footer nav a:hover {
+  color: #fff;
+}
+.filter-bar {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.filter-bar .field {
+  margin-bottom: 0;
+  min-width: 145px;
+  flex: 1;
+}
+.filter-bar .error {
+  flex-basis: 100%;
+  margin: 0;
+}
+.plan-management .check-label {
+  font-size: 10px;
+  margin: 0;
+}
+.skip-link {
+  position: fixed;
+  left: 15px;
+  top: -100px;
+  z-index: 80;
+  background: #ef3b3b;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 5px;
+}
+.skip-link:focus {
+  top: 15px;
+}
+.modal:focus {
+  outline: none;
+}
+@media (max-width: 650px) {
+  .hero .hero-title {
+    font-size: 51px;
+  }
+  .section-intro {
+    font-size: 12px;
+  }
+  footer nav {
+    gap: 15px;
+    font-size: 10px;
+  }
+  .filter-bar {
+    gap: 12px;
+  }
+  .filter-bar .field {
+    min-width: 120px;
+  }
+  .plan-management .check-label {
+    flex-basis: 100%;
+  }
+  .card-heading > .field {
+    min-width: 90px;
+    font-size: 9px;
+  }
+  .card-heading > .field select {
+    font-size: 10px;
+    padding: 8px;
+  }
+}

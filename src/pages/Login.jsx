@@ -4,6 +4,7 @@ import { Eye, EyeOff, ArrowRight, ShieldCheck, Dumbbell } from 'lucide-react';
 import { Logo } from '../components/Layout';
 import { Button, Input } from '../components/UI';
 import { useApp } from '../context/AppContext';
+import { friendlyError } from '../utils/errors';
 export default function Login() {
   const { user, loading, authError, configured, api, callbackUrl, recovery, setRecovery, logout } =
     useApp();
@@ -65,22 +66,13 @@ export default function Login() {
       }
       setForm((f) => ({ ...f, password: '', confirmation: '' }));
     } catch (err) {
-      const text = err.message || '';
-      setError(
-        /invalid login credentials|invalid_credentials/i.test(text)
-          ? 'E-mail ou senha incorretos.'
-          : /email not confirmed/i.test(text)
-            ? 'Confirme seu e-mail antes de entrar.'
-            : /already registered|already been registered/i.test(text)
-              ? 'E-mail já cadastrado. Entre ou recupere sua senha.'
-              : text || 'Não foi possível concluir. Tente novamente.',
-      );
+      setError(friendlyError(err));
     } finally {
       setPending(false);
     }
   }
   return (
-    <main className="login-page">
+    <main className="login-page" id="main-content" tabIndex={-1}>
       <section className="login-story">
         <Logo />
         <div>
@@ -99,7 +91,7 @@ export default function Login() {
           </p>
           <Dumbbell size={110} strokeWidth={1} />
         </div>
-        <small>IRON PULSE GYM • Projeto acadêmico</small>
+        <small>IRON PULSE GYM • Força para seguir em frente.</small>
       </section>
       <section className="login-panel">
         <Link className="text-link" to="/">
@@ -135,8 +127,7 @@ export default function Login() {
           )}
           {!configured && (
             <p className="info" role="alert">
-              O acesso ainda não está disponível. A administração precisa configurar o serviço de
-              autenticação.
+              O acesso está temporariamente indisponível. Tente novamente mais tarde.
             </p>
           )}
           {loading && <p role="status">Verificando sua sessão…</p>}
@@ -258,8 +249,8 @@ export default function Login() {
           )}
           <p className="security-note">
             <ShieldCheck size={19} />
-            Acesso com e-mail e senha. Contas de professor exigem convite; a administração é
-            provisionada fora do cadastro público. Os planos são acadêmicos e não geram cobrança.
+            Seu acesso é pessoal. Professores recebem convite da equipe responsável. Escolher um
+            plano no cadastro não realiza contratação nem cobrança.
           </p>
         </div>
       </section>

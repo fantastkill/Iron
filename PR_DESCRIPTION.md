@@ -1,13 +1,20 @@
-﻿## Problema e comportamento final
+﻿## O que muda
 
-O acesso aos painéis era possível por escolha de perfil e qualquer senha fictícia. Esta alteração remove esses atalhos e integra as seis páginas ao Supabase Auth e a um banco PostgreSQL com RLS, preservando a identidade visual.
+Reconstrói a versão anterior em seis páginas React integradas ao Supabase Auth e PostgreSQL com RLS. Remove acesso automático por perfil e senhas simuladas. Preserva a identidade visual e refina a apresentação pública, sem depoimentos, contatos, horários ou ofertas não confirmadas.
 
-Cadastro público cria somente aluno. Professor depende de convite autorizado; administrador é provisionado fora do site. As operações usam o JWT do usuário, RPCs restritos e uma Edge Function administrativa. Medidas são privadas do aluno; consulta administrativa de treinos exige consentimento.
+Inclui cadastro público de aluno, convites administrativos para professor, perfis provisionados com segurança, fichas, progresso, medidas privadas, consentimento para consulta administrativa, filtros, exportação CSV e exercícios personalizados. Preços só aparecem após autorização explícita de um administrador. Modais têm controle de foco/teclado e erros técnicos são traduzidos para mensagens de uso.
 
-## Validação e limite de entrega
+## Validação
 
-Testes locais de interface/contratos e PostgreSQL/RLS, build, audit e checks públicos em navegador estão documentados em ENTREGA_FINAL.md. Esses resultados não substituem validação do Supabase hospedado.
+- npm ci, 55 testes locais, build de produção e npm audit aprovados; zero vulnerabilidades reportadas.
+- 3 testes Playwright aprovados em 390/768/1366px.
+- Migrações e RLS executadas em PostgreSQL local/PGlite.
+- Interfaces Auth testadas com SDK mockado; isso NÃO comprova autenticação hospedada.
 
-**PR deve permanecer draft e sem merge/deploy:** o proprietário ainda não possui projeto Supabase. É necessário criar/configurar o projeto, aplicar a migração, publicar a Edge Function, provisionar contas e executar os testes reais. A autorização do usuário para publicar é condicionada a essas verificações.
+## Bloqueio de liberação
 
-Guia: supabase/SETUP.md. Roteiro acadêmico: APRESENTACAO_PROFESSOR.md. O workflow de publicação é manual e bloqueia ausência de configuração/integração.
+**Manter como draft, sem merge ou deploy até configurar e validar Supabase.**
+
+O proprietário ainda precisa criar/configurar o projeto, aplicar as duas migrações, publicar a Edge Function, provisionar contas e testar Auth, SMTP, convites, recuperação, sessão e RLS no serviço real. O workflow de publicação exige configuração e teste de integração. A autorização do usuário já cobre merge/deploy quando essas condições técnicas forem cumpridas.
+
+Guia: supabase/SETUP.md. Evidências e estado: ENTREGA_FINAL.md. Roteiro acadêmico: APRESENTACAO_PROFESSOR.md.

@@ -10,12 +10,12 @@ import Professor from './pages/Professor';
 import Student from './pages/Student';
 import Evolution from './pages/Evolution';
 import './styles/global.css';
-import {AuthReturn} from './components/AuthReturn';
+import { AuthReturn } from './components/AuthReturn';
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HashRouter>
       <AppProvider>
-        <AuthReturn/>
+        <AuthReturn />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

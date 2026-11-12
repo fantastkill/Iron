@@ -61,7 +61,7 @@ ProtectedRoute organiza a navegação, mas não é a barreira de segurança do b
 
 ## Roteiro das seis páginas — 8 a 12 minutos
 
-1. **Home:** objetivo, identidade visual, três planos fictícios, seleção de plano e FAQ.
+1. **Home:** objetivo, identidade visual, três planos de interesse, seleção de plano e FAQ.
 2. **Login/Cadastro:** criar aluno, demonstrar confirmação divergente, explicar e-mail de confirmação, entrar e mostrar rejeição de senha incorreta.
 3. **Administrador:** métricas dos cadastros, convite de professor, atribuição de aluno, edição de plano/preço e confirmação antes da exclusão de uma conta descartável.
 4. **Professor:** entrar como professor, mostrar somente o aluno atribuído e criar uma ficha com séries, repetições, descanso e dias. Mostrar que o outro aluno não aparece.
@@ -94,3 +94,8 @@ Ao finalizar, mostrar arquivos pequenos de exemplo: UI.jsx para props, Login.jsx
 **O que os testes comprovam?** Os testes de interface verificam contratos com SDK simulado; PGlite executa RLS/RPCs em PostgreSQL local; navegador verifica as páginas públicas e os redirecionamentos. Só os testes com projeto configurado comprovam o Auth/serviço hospedado.
 
 **Está aprovado pela faculdade?** A aprovação pertence ao professor e depende dos critérios da disciplina. A documentação descreve o trabalho e as evidências, sem garantir nota.
+
+
+## Refinamento comercial sem inventar ofertas
+
+A documentação preserva o objetivo da disciplina; a interface usa comunicação de produto. Não há depoimentos ou contatos inventados. Os preços de desenvolvimento não são mostrados até um administrador confirmar sua publicação. Plano selecionado é uma preferência, não prova de contratação. Demonstre os filtros, a exportação CSV, o exercício personalizado, o período de datas e o controle de foco dos modais. A autorização para publicar foi dada pelo usuário, mas a autenticação hospedada precisa estar configurada e validada antes do deploy.
