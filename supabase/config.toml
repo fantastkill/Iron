@@ -1,0 +1,3 @@
+[functions.manage-users]
+# O handler valida o JWT com getUser antes de qualquer operação privilegiada.
+verify_jwt = false
