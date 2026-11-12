@@ -51,7 +51,7 @@ Os testes de interface usam mocks do SDK. PGlite usa PostgreSQL local com uma ta
 
 O proprietário concluiu gh auth login pelo fluxo oficial de dispositivo. GitHub CLI confirmou login como fantastkill e permissões push/admin em fantastkill/Iron. O bloqueio anterior de credencial Git foi resolvido.
 
-O envio da branch, PR e resultados de GitHub Actions serão registrados ao final deste documento após as operações. Não há autorização adicional pendente para commit/push/PR/merge/deploy; existe a condição funcional explícita de não publicar login sem autenticação real configurada e validada.
+A branch foi enviada ao GitHub e o PR #1 foi aberto como rascunho contra main. Os checks de revisão da implementação c687de4 passaram no GitHub Actions. Não há autorização adicional pendente para commit/push/PR/merge/deploy; existe a condição funcional explícita de não publicar login sem autenticação real configurada e validada.
 
 O Pages atual foi consultado: build_type=legacy, status=built. Não foi alterado para Actions nesta etapa, pois isso faz parte da liberação após a validação do Supabase. A versão pública anterior permanece preservada.
 
@@ -82,3 +82,18 @@ Enquanto isso:
 9. Validar a URL pública, assets, seis rotas, refresh e autenticação real depois do deploy.
 
 O roteiro para apresentar a implementação ao professor está em APRESENTACAO_PROFESSOR.md. A avaliação acadêmica depende do professor; este relatório não promete aprovação.
+
+
+## Operações efetivamente concluídas no GitHub
+
+- Commit de implementação: c687de4 — feat: refine gym product content, reports and accessible workflows.
+- Push: concluído para origin/feat/iron-pulse-platform, incluindo os commits locais anteriores.
+- Pull Request: https://github.com/fantastkill/Iron/pull/1, em draft, destino main.
+- GitHub Actions da implementação: aprovado em https://github.com/fantastkill/Iron/actions/runs/43227635894. O job executou instalação, testes, build e audit em Ubuntu.
+- Aprovação técnica de liberação: pendente de integração real no Supabase.
+- Merge: não realizado.
+- Deploy: não acionado, por faltar autenticação configurada/validada. O Pages anterior permanece preservado.
+- Gate de configuração: node scripts/check-config.mjs rejeitou corretamente a ausência das variáveis públicas.
+- Integração hospedada: npm run test:integration confirmou ausência do ambiente e não executou os testes; não foi reportada como sucesso.
+
+Uma atualização documental posterior pode possuir outro hash; consulte o último commit e o estado dos checks diretamente no PR. A falta de credencial Git foi resolvida pelo login interativo autorizado; o bloqueio restante é o Supabase.

@@ -2,7 +2,7 @@
 
 Projeto acadêmico de gerenciamento de academia em React, Vite e JavaScript. A interface preta/grafite/vermelha foi preservada; a versão atual substitui o acesso demonstrativo por integração com **Supabase Auth e PostgreSQL com RLS**.
 
-**Estado:** integração implementada, mas o usuário ainda não possui projeto Supabase. Não há credenciais, migração aplicada no serviço, integração hospedada validada ou publicação desta versão. Sem configuração, Home e Login são públicos e os painéis permanecem bloqueados. Não existe login fictício, visitante autenticado ou botão que escolha um papel.
+**Estado:** integração implementada, mas nenhum projeto Supabase foi conectado a este ambiente. Não há credenciais, migração aplicada no serviço, integração hospedada validada ou publicação desta versão. Sem configuração, Home e Login são públicos e os painéis permanecem bloqueados. Não existe login fictício, visitante autenticado ou botão que escolha um papel.
 
 ## Execução
 
@@ -128,3 +128,8 @@ O contexto acadêmico permanece documentado, sem rótulos desnecessários na int
 A Home apresenta o título “TRANSFORME SUA FORÇA. SUPERE SEUS LIMITES.” e não publica depoimentos, contatos ou horários inventados. Os planos são preferências registradas no cadastro; não equivalem a um contrato. Preços sem confirmação aparecem como “Consulte condições”. A migração 202611120002_publish_prices.sql acrescenta a autorização de exibição de preço e atualiza o RPC administrativo. Aplique-a após a migração base.
 
 Administração: filtros por situação/plano e exportação CSV dos cadastros visíveis, com proteção contra fórmulas de planilha. Professor: filtros, exercícios personalizados persistidos na ficha e seleção inicial somente de aluno ativo. Evolução: intervalos personalizados com validação das datas. Modais: foco inicial, navegação de teclado contida, Escape e retorno do foco. Mensagens inesperadas do banco são convertidas para orientações em português.
+
+
+## Estado do GitHub nesta revisão
+
+Branch enviada e [PR #1 aberto como rascunho](https://github.com/fantastkill/Iron/pull/1), contra main. [Checks da implementação aprovados](https://github.com/fantastkill/Iron/actions/runs/43227635894): instalação, testes, build e audit. Localmente: 55 testes e 3 verificações de navegador aprovados. Não houve merge ou deploy, pois o Supabase ainda precisa ser configurado e validado. A nova interface não está na URL pública ainda. A pendência e o roteiro de liberação estão em ENTREGA_FINAL.md.
