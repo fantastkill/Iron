@@ -60,3 +60,38 @@ Para o GitHub, disponibilizar uma conexão ou credencial com escrita no reposit�
 - [ ] PR revisado, destino main e ausência de segredos confirmados.
 - [ ] Merge e workflow executados somente após cumprir as condições.
 - [ ] URL pública e refresh das seis rotas validados após deploy.
+
+## Resultado final desta execução
+
+- npm ci: aprovado após encerrar a prévia que mantinha esbuild.exe aberto no Windows.
+- npm test: **45/45 aprovados**, 3 arquivos, última execução em 13,40 segundos.
+- npm run build: **aprovado sem avisos**, última execução em 13,66 segundos.
+- Bundles antes de gzip: aplicação 312,69 kB; Supabase SDK 228,75 kB; gráficos 410,71 kB; CSS 29,49 kB.
+- npm audit: **zero vulnerabilidades reportadas**.
+- Playwright: **2/2 aprovados**, em 390px e 1366px; verifica páginas públicas e redirecionamentos, sem conta Supabase. Screenshots locais ignorados pelo Git em artifacts/.
+- Migração/RLS/RPCs: executadas nos testes PostgreSQL locais, incluindo bloqueio de promoção por metadata e de convite sem senha definida.
+- scripts/check-config.mjs: bloqueou corretamente a publicação por falta de configuração pública.
+- npm run test:integration: **não executou os testes reais**, pois .env.integration.local e o projeto Supabase não existem. Isso não é sucesso de integração.
+- git diff --cached --check: aprovado antes do commit.
+- Revisão dos 44 arquivos adicionados/modificados preparados: sem diretórios gerados, ambientes preenchidos nem padrões de segredo verificados. Não é certificação por scanner de segredos.
+
+O cadastro recebeu um rótulo acessível explícito no seletor de plano após a verificação no navegador. Testes dos callbacks passaram a usar uma Home mínima no harness para verificar navegação sem o custo de renderizar toda a landing page. Não houve aumento genérico de timeout.
+
+Commit de implementação local: **7e670ed** — feat: integrate Supabase authentication and scoped gym dashboards.
+
+### Resultado do envio ao GitHub
+
+Tentativa real: `git push -u origin feat/iron-pulse-platform`, sem solicitar senha interativamente.
+
+Resultado: **falhou por ausência de credencial Git disponível** (`Cannot prompt because user interactivity has been disabled` / `unable to get password from user`). O conector GitHub também informou somente leitura, sem push/admin.
+
+Portanto:
+
+- A branch e os commits estão salvos localmente.
+- O remoto não foi atualizado.
+- Não foi possível criar um PR com a implementação, pois a branch não está no remoto.
+- PR_DESCRIPTION.md contém o texto preparado para um PR draft.
+- Nenhum merge foi feito e nenhum workflow de publicação foi acionado.
+- Não houve substituição do site público, nem validação de uma versão nova na URL de produção.
+
+Depois de autenticar o Git com uma conta autorizada a escrever em fantastkill/Iron, enviar a branch e abrir o PR draft contra main. Manter o PR sem merge até aplicar o guia Supabase e validar os fluxos reais. A publicação não requer nova autorização genérica: a autorização existente é válida quando suas condições forem comprovadamente satisfeitas.
