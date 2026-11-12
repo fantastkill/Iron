@@ -1,18 +1,11 @@
-# Node (se alguém adicionar npm depois)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# VS Code local
-.vscode/extensions.json
-.vscode/launch.json
-.vscode/tasks.json
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temp
-*.tmp
-*.bak
-*.swp
+﻿node_modules/
+dist/
+*.local
+.env
+.env.*
+!.env.example
+!.env.integration.example
+*.log
+playwright-report/
+test-results/
+artifacts/
