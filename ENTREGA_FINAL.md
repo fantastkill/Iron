@@ -97,3 +97,8 @@ O roteiro para apresentar a implementação ao professor está em APRESENTACAO_P
 - Integração hospedada: npm run test:integration confirmou ausência do ambiente e não executou os testes; não foi reportada como sucesso.
 
 Uma atualização documental posterior pode possuir outro hash; consulte o último commit e o estado dos checks diretamente no PR. A falta de credencial Git foi resolvida pelo login interativo autorizado; o bloqueio restante é o Supabase.
+
+
+### Atualização das Actions
+
+Após a CI aprovada apontar a depreciação do runtime Node 20 nas Actions antigas, as referências foram atualizadas para versões oficiais verificadas: checkout 7.0.1, setup-node 7.1.0, configure-pages 6.0.0, upload-pages-artifact 5.0.0 e deploy-pages 5.0.1. O runner foi fixado em ubuntu-24.04 para evitar mudanças automáticas de imagem. O aplicativo continua sendo testado com Node 22. Os novos checks são acompanhados no PR; a configuração de deploy permanece sem execução até validar o Supabase.
